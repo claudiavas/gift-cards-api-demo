@@ -193,100 +193,97 @@
       every action in an audit log the developer cannot alter.
     </p>
     <div class="diagram-box">
-      <svg viewBox="0 0 960 640" role="img" aria-label="Sequence diagram of the Gift Cards API">
+      <svg viewBox="0 0 960 1210" role="img" aria-label="Flowchart of the Gift Cards API">
         <defs>
           <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--muted)"/>
           </marker>
-          <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--accent)"/>
-          </marker>
         </defs>
 
-        <!-- Participants -->
-        <rect class="node" x="25" y="12" width="150" height="60" rx="12"/>
-        <text class="label" x="100" y="38" text-anchor="middle">Any CRM</text>
-        <text class="small" x="100" y="60" text-anchor="middle">scheduler or button</text>
+        <!-- START -->
+        <rect x="305" y="18" width="350" height="54" rx="27" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text class="label" x="480" y="41" text-anchor="middle" style="fill: var(--accent)">CRM calls POST /process</text>
+        <text class="small" x="480" y="61" text-anchor="middle">with a unique rewardId</text>
+        <path class="arrow" d="M 480 72 V 106" stroke-width="1.6"/>
 
-        <rect class="node node-api" x="245" y="12" width="160" height="60" rx="12"/>
-        <text class="label" x="325" y="38" text-anchor="middle">Gift Cards API</text>
-        <text class="small" x="325" y="60" text-anchor="middle">Node.js</text>
+        <!-- D1: valid API key? -->
+        <polygon points="480,110 630,165 480,220 330,165" fill="var(--bg)" stroke="var(--accent)"/>
+        <text class="label" x="480" y="171" text-anchor="middle">valid API key?</text>
+        <path class="arrow" d="M 330 165 H 270" stroke-width="1.6"/>
+        <text class="edge-label" x="300" y="154" text-anchor="middle">no</text>
+        <rect x="60" y="138" width="205" height="54" rx="10" fill="var(--err-soft)" stroke="var(--err)"/>
+        <text class="label" x="162" y="171" text-anchor="middle" style="fill: var(--err)">401 Unauthorized</text>
+        <path class="arrow" d="M 480 220 V 256" stroke-width="1.6"/>
+        <text class="edge-label" x="497" y="243" text-anchor="middle">yes</text>
 
-        <rect class="node" x="475" y="12" width="150" height="60" rx="12"/>
-        <text class="label" x="550" y="38" text-anchor="middle">Amazon</text>
-        <text class="small" x="550" y="60" text-anchor="middle">Incentives API</text>
+        <!-- D2: card already exists? -->
+        <polygon points="480,260 650,315 480,370 310,315" fill="var(--bg)" stroke="var(--accent)"/>
+        <text class="small" x="480" y="310" text-anchor="middle">already a gift card</text>
+        <text class="small" x="480" y="330" text-anchor="middle">for this rewardId?</text>
+        <path class="arrow" d="M 650 315 H 718" stroke-width="1.6"/>
+        <text class="edge-label" x="684" y="304" text-anchor="middle">yes</text>
+        <rect x="722" y="288" width="220" height="54" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+        <text class="small" x="832" y="310" text-anchor="middle" style="font-weight: 600; fill: var(--text)">reuse the existing code</text>
+        <text class="small" x="832" y="330" text-anchor="middle">no double spend · max 5 resends</text>
+        <path class="arrow" d="M 832 342 V 993 H 634" stroke-width="1.6"/>
+        <path class="arrow" d="M 480 370 V 406" stroke-width="1.6"/>
+        <text class="edge-label" x="496" y="393" text-anchor="middle">no</text>
 
-        <rect class="node" x="655" y="12" width="150" height="60" rx="12"/>
-        <text class="label" x="730" y="38" text-anchor="middle">PostgreSQL</text>
-        <text class="small" x="730" y="60" text-anchor="middle">encrypted store</text>
+        <!-- D3: is the contact a customer? -->
+        <polygon points="480,410 650,465 480,520 310,465" fill="var(--bg)" stroke="var(--accent)"/>
+        <text class="small" x="480" y="460" text-anchor="middle">is the contact a customer?</text>
+        <text class="small" x="480" y="480" text-anchor="middle">(lookup in the CRM)</text>
+        <path class="arrow" d="M 310 465 H 270" stroke-width="1.6"/>
+        <text class="edge-label" x="291" y="454" text-anchor="middle">no</text>
+        <rect x="60" y="438" width="205" height="54" rx="10" fill="var(--err-soft)" stroke="var(--err)"/>
+        <text class="label" x="162" y="471" text-anchor="middle" style="fill: var(--err)">400 · not eligible</text>
+        <path class="arrow" d="M 480 520 V 556" stroke-width="1.6"/>
+        <text class="edge-label" x="497" y="543" text-anchor="middle">yes</text>
 
-        <rect class="node" x="835" y="12" width="115" height="60" rx="12"/>
-        <text class="label" x="892" y="38" text-anchor="middle">SendGrid</text>
-        <text class="small" x="892" y="60" text-anchor="middle">email</text>
+        <!-- D4: enough funds? -->
+        <polygon points="480,560 650,615 480,670 310,615" fill="var(--bg)" stroke="var(--accent)"/>
+        <text class="small" x="480" y="610" text-anchor="middle">enough funds</text>
+        <text class="small" x="480" y="630" text-anchor="middle">in the Amazon account?</text>
+        <path class="arrow" d="M 310 615 H 270" stroke-width="1.6"/>
+        <text class="edge-label" x="291" y="604" text-anchor="middle">no</text>
+        <rect x="60" y="588" width="205" height="54" rx="10" fill="var(--err-soft)" stroke="var(--err)"/>
+        <text class="label" x="162" y="615" text-anchor="middle" style="fill: var(--err)">402 · alert the CRM</text>
+        <text class="small" x="162" y="633" text-anchor="middle">reload the account</text>
+        <path class="arrow" d="M 480 670 V 705" stroke-width="1.6"/>
+        <text class="edge-label" x="497" y="692" text-anchor="middle">yes</text>
 
-        <!-- Lifelines -->
-        <line x1="100" y1="72" x2="100" y2="560" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 6"/>
-        <line x1="325" y1="72" x2="325" y2="560" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 6"/>
-        <line x1="550" y1="72" x2="550" y2="560" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 6"/>
-        <line x1="730" y1="72" x2="730" y2="560" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 6"/>
-        <line x1="892" y1="72" x2="892" y2="560" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 6"/>
+        <!-- P1: Amazon -->
+        <rect x="330" y="707" width="300" height="56" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+        <text class="small" x="480" y="730" text-anchor="middle" style="font-weight: 600; fill: var(--text)">Amazon generates the claim code</text>
+        <text class="small" x="480" y="750" text-anchor="middle">AWS SigV4 · retries with backoff</text>
+        <path class="arrow" d="M 480 763 V 793" stroke-width="1.6"/>
 
-        <!-- 1 · CRM → API -->
-        <circle cx="90" cy="110" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="90" y="114.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">1</text>
-        <path class="arrow-accent" d="M 106 110 H 322" stroke-width="2"/>
-        <text class="edge-label" x="214" y="99" text-anchor="middle">POST /process (rewardId)</text>
-        <text class="small" x="214" y="128" text-anchor="middle">authenticated with x-api-key</text>
+        <!-- P2: encrypt -->
+        <rect x="330" y="795" width="300" height="50" rx="25" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text class="small" x="480" y="825" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">🔐 encrypted in memory · AES-256-GCM</text>
+        <path class="arrow" d="M 480 845 V 875" stroke-width="1.6"/>
 
-        <!-- 2 · API ⇄ CRM: customer validation -->
-        <circle cx="335" cy="168" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="172.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">2</text>
-        <path class="arrow" d="M 320 168 H 103" stroke-width="1.6"/>
-        <text class="small" x="214" y="157" text-anchor="middle">is this contact a customer?</text>
-        <path class="arrow" d="M 103 198 H 322" stroke-width="1.6" stroke-dasharray="5 5"/>
-        <text class="small" x="214" y="187" text-anchor="middle">eligible ✓</text>
+        <!-- P3: store -->
+        <rect x="330" y="877" width="300" height="56" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+        <text class="small" x="480" y="900" text-anchor="middle" style="font-weight: 600; fill: var(--text)">PostgreSQL stores the ciphertext</text>
+        <text class="small" x="480" y="920" text-anchor="middle">+ append-only audit entry</text>
+        <path class="arrow" d="M 480 933 V 963" stroke-width="1.6"/>
 
-        <!-- 3 · API ⇄ PostgreSQL: idempotency -->
-        <circle cx="335" cy="240" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="244.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">3</text>
-        <path class="arrow" d="M 350 240 H 727" stroke-width="1.6"/>
-        <text class="small" x="538" y="229" text-anchor="middle">any gift card for this rewardId yet? (UNIQUE)</text>
-        <path class="arrow" d="M 727 270 H 328" stroke-width="1.6" stroke-dasharray="5 5"/>
-        <text class="small" x="538" y="259" text-anchor="middle">none — go ahead</text>
+        <!-- P4: email -->
+        <rect x="330" y="965" width="300" height="56" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+        <text class="small" x="480" y="988" text-anchor="middle" style="font-weight: 600; fill: var(--text)">SendGrid emails the code</text>
+        <text class="small" x="480" y="1008" text-anchor="middle">decrypted only inside this step</text>
+        <path class="arrow" d="M 480 1021 V 1051" stroke-width="1.6"/>
 
-        <!-- 4 · API ⇄ Amazon: generate code -->
-        <circle cx="335" cy="312" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="316.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">4</text>
-        <path class="arrow" d="M 350 312 H 547" stroke-width="1.6"/>
-        <text class="small" x="448" y="301" text-anchor="middle">create gift card (AWS SigV4)</text>
-        <path class="arrow" d="M 547 342 H 328" stroke-width="1.6" stroke-dasharray="5 5"/>
-        <text class="small" x="448" y="331" text-anchor="middle">claim code 💳</text>
+        <!-- P5: status update -->
+        <rect x="330" y="1053" width="300" height="56" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+        <text class="small" x="480" y="1076" text-anchor="middle" style="font-weight: 600; fill: var(--text)">status update back to the CRM</text>
+        <text class="small" x="480" y="1096" text-anchor="middle">metadata only — never the code</text>
+        <path class="arrow" d="M 480 1109 V 1139" stroke-width="1.6"/>
 
-        <!-- encryption note on API lifeline -->
-        <rect x="205" y="362" width="240" height="30" rx="15" fill="var(--accent-soft)"/>
-        <text class="small" x="325" y="381" text-anchor="middle" style="fill: var(--accent); font-weight: 600;">🔐 encrypted in memory · AES-256-GCM</text>
-
-        <!-- 5 · API → PostgreSQL: store -->
-        <circle cx="335" cy="430" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="434.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">5</text>
-        <path class="arrow" d="M 350 430 H 727" stroke-width="1.6"/>
-        <text class="small" x="538" y="419" text-anchor="middle">store ciphertext + append audit entry</text>
-
-        <!-- 6 · API → SendGrid: email -->
-        <circle cx="335" cy="480" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="484.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">6</text>
-        <path class="arrow" d="M 350 480 H 889" stroke-width="1.6"/>
-        <text class="small" x="618" y="469" text-anchor="middle">email the code to the customer</text>
-
-        <!-- 7 · API → CRM: status update -->
-        <circle cx="335" cy="530" r="11" fill="var(--accent-soft)"/>
-        <text class="small" x="335" y="534.5" text-anchor="middle" style="fill: var(--accent); font-weight: 700;">7</text>
-        <path class="arrow" d="M 320 530 H 103" stroke-width="1.6" stroke-dasharray="5 5"/>
-        <text class="small" x="214" y="519" text-anchor="middle">status update (metadata only)</text>
-
-        <!-- Outcome -->
-        <rect x="180" y="586" width="600" height="42" rx="21" fill="var(--ok-soft)"/>
-        <text class="small" x="480" y="612" text-anchor="middle" style="fill: var(--ok); font-weight: 700;">🎁 The customer receives the gift card by email — and no one else ever saw the code</text>
+        <!-- END -->
+        <rect x="280" y="1141" width="400" height="54" rx="27" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text class="label" x="480" y="1174" text-anchor="middle" style="fill: var(--ok)">🎁 the customer receives the gift card</text>
       </svg>
     </div>
   </section>
