@@ -2,7 +2,7 @@
 
 API REST que automatiza un programa de recompensas por referidos: genera tarjetas regalo de Amazon, las encripta, las entrega por email y deja una pista de auditoría inmutable.
 
-**🚀 Demo interactiva en vivo:** _(URL de despliegue — ver más abajo)_
+**🚀 Demo interactiva en vivo:** <https://gift-cards-api-production.up.railway.app>
 
 > La demo hace peticiones HTTP reales a esta API. Amazon, BigQuery y SendGrid están simulados (`DEMO_MODE`): los códigos son ficticios y no se envía ningún email real.
 
