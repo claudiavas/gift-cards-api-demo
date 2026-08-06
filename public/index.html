@@ -67,13 +67,13 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 1rem; overflow-x: auto;
   }
-  .diagram-box svg { display: block; min-width: 720px; width: 100%; height: auto; }
+  .diagram-box svg { display: block; min-width: 820px; width: 100%; height: auto; }
   .diagram-box .node { fill: var(--bg); stroke: var(--border); }
   .diagram-box .node-api { fill: var(--accent-soft); stroke: var(--accent); }
   .diagram-box text { fill: var(--text); font-family: inherit; }
-  .diagram-box .label { font-size: 12px; font-weight: 700; }
-  .diagram-box .small { font-size: 10px; fill: var(--muted); font-weight: 400; }
-  .diagram-box .edge-label { font-size: 10px; fill: var(--accent); font-weight: 600; }
+  .diagram-box .label { font-size: 16px; font-weight: 700; }
+  .diagram-box .small { font-size: 13px; fill: var(--muted); font-weight: 400; }
+  .diagram-box .edge-label { font-size: 13px; fill: var(--accent); font-weight: 600; }
   .diagram-box .arrow { stroke: var(--muted); fill: none; marker-end: url(#arr); }
   .diagram-box .arrow-accent { stroke: var(--accent); fill: none; marker-end: url(#arrA); }
 
@@ -176,14 +176,13 @@
     <span class="badge">Node.js + Express</span>
     <span class="badge">Amazon Incentives API</span>
     <span class="badge">AES-256-GCM</span>
-    <span class="badge">BigQuery</span>
+    <span class="badge">PostgreSQL</span>
     <span class="badge">SendGrid</span>
-    <span class="badge">Cloud Logging</span>
     <span class="badge">Docker + CI</span>
   </div>
   <div class="demo-banner" id="demoBanner">
     🧪 <strong>Demo mode:</strong> every button below fires a real HTTP request against this API.
-    Amazon, BigQuery and SendGrid are simulated — codes are fake and no actual email is sent.
+    Amazon, the CRM and SendGrid are simulated — codes are fake and no actual email is sent.
   </div>
 </header>
 
@@ -198,63 +197,63 @@
       every action in an audit log the developer cannot alter.
     </p>
     <div class="diagram-box">
-      <svg viewBox="0 0 900 380" role="img" aria-label="Architecture diagram of the Gift Cards API">
+      <svg viewBox="0 0 960 460" role="img" aria-label="Architecture diagram of the Gift Cards API">
         <defs>
-          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--muted)"/>
           </marker>
-          <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--accent)"/>
           </marker>
         </defs>
 
         <!-- CRM -->
-        <rect class="node" x="20" y="130" width="150" height="90" rx="12"/>
-        <text class="label" x="95" y="165" text-anchor="middle">Any CRM /</text>
-        <text class="label" x="95" y="181" text-anchor="middle">backoffice</text>
-        <text class="small" x="95" y="201" text-anchor="middle">daily scheduler or button</text>
+        <rect class="node" x="10" y="150" width="175" height="110" rx="14"/>
+        <text class="label" x="97" y="192" text-anchor="middle">Any CRM /</text>
+        <text class="label" x="97" y="213" text-anchor="middle">backoffice</text>
+        <text class="small" x="97" y="238" text-anchor="middle">scheduler or button</text>
 
         <!-- API -->
-        <rect class="node node-api" x="280" y="60" width="240" height="230" rx="14"/>
-        <text class="label" x="400" y="88" text-anchor="middle">Gift Cards API (Node.js)</text>
-        <text class="small" x="300" y="118">1 · API-key auth + rate limiting</text>
-        <text class="small" x="300" y="140">2 · Idempotency check (rewardId)</text>
-        <text class="small" x="300" y="162">3 · Customer validation via CRM</text>
-        <text class="small" x="300" y="184">4 · Generate code (AWS SigV4)</text>
-        <text class="small" x="300" y="206">5 · Encrypt AES-256-GCM in memory</text>
-        <text class="small" x="300" y="228">6 · Store ciphertext only</text>
-        <text class="small" x="300" y="250">7 · Email the recipient</text>
-        <text class="small" x="300" y="272">8 · Append to audit log</text>
+        <rect class="node node-api" x="290" y="50" width="300" height="310" rx="16"/>
+        <text class="label" x="440" y="84" text-anchor="middle">Gift Cards API · Node.js</text>
+        <text class="small" x="312" y="118">1 · API-key auth + rate limiting</text>
+        <text class="small" x="312" y="146">2 · Idempotency check (rewardId)</text>
+        <text class="small" x="312" y="174">3 · Customer validation via CRM</text>
+        <text class="small" x="312" y="202">4 · Generate code (AWS SigV4)</text>
+        <text class="small" x="312" y="230">5 · Encrypt AES-256-GCM in memory</text>
+        <text class="small" x="312" y="258">6 · Store ciphertext only</text>
+        <text class="small" x="312" y="286">7 · Email the recipient</text>
+        <text class="small" x="312" y="314">8 · Append to audit log</text>
 
         <!-- Amazon -->
-        <rect class="node" x="640" y="40" width="230" height="64" rx="12"/>
-        <text class="label" x="755" y="67" text-anchor="middle">Amazon Incentives API</text>
-        <text class="small" x="755" y="86" text-anchor="middle">creates the gift card code</text>
+        <rect class="node" x="670" y="40" width="280" height="76" rx="14"/>
+        <text class="label" x="810" y="72" text-anchor="middle">Amazon Incentives API</text>
+        <text class="small" x="810" y="96" text-anchor="middle">creates the gift card code</text>
 
         <!-- SendGrid -->
-        <rect class="node" x="640" y="128" width="230" height="64" rx="12"/>
-        <text class="label" x="755" y="155" text-anchor="middle">SendGrid</text>
-        <text class="small" x="755" y="174" text-anchor="middle">delivers code to the customer</text>
+        <rect class="node" x="670" y="136" width="280" height="76" rx="14"/>
+        <text class="label" x="810" y="168" text-anchor="middle">SendGrid</text>
+        <text class="small" x="810" y="192" text-anchor="middle">delivers the code by email</text>
 
-        <!-- BigQuery -->
-        <rect class="node" x="640" y="216" width="230" height="64" rx="12"/>
-        <text class="label" x="755" y="243" text-anchor="middle">BigQuery</text>
-        <text class="small" x="755" y="262" text-anchor="middle">encrypted codes only — no plaintext</text>
+        <!-- PostgreSQL -->
+        <rect class="node" x="670" y="232" width="280" height="76" rx="14"/>
+        <text class="label" x="810" y="264" text-anchor="middle">PostgreSQL</text>
+        <text class="small" x="810" y="288" text-anchor="middle">encrypted codes only — no plaintext</text>
 
         <!-- Audit -->
-        <rect class="node" x="640" y="304" width="230" height="64" rx="12"/>
-        <text class="label" x="755" y="331" text-anchor="middle">Immutable audit log</text>
-        <text class="small" x="755" y="350" text-anchor="middle">read-only auditor role</text>
+        <rect class="node" x="670" y="328" width="280" height="76" rx="14"/>
+        <text class="label" x="810" y="360" text-anchor="middle">Append-only audit log</text>
+        <text class="small" x="810" y="384" text-anchor="middle">read-only auditor role</text>
 
         <!-- edges -->
-        <path class="arrow-accent" d="M 170 165 H 280" stroke-width="1.5"/>
-        <text class="edge-label" x="225" y="155" text-anchor="middle">POST /gift-cards/process</text>
-        <path class="arrow" d="M 520 110 C 580 100, 590 80, 640 74" stroke-width="1.2"/>
-        <path class="arrow" d="M 520 200 C 580 190, 590 170, 640 160" stroke-width="1.2"/>
-        <path class="arrow" d="M 520 240 C 580 240, 590 246, 640 248" stroke-width="1.2"/>
-        <path class="arrow" d="M 520 275 C 580 290, 590 325, 640 334" stroke-width="1.2"/>
-        <path class="arrow" d="M 400 290 C 400 340, 260 350, 172 220 M 172 220 L 170 218" stroke-width="1.2" stroke-dasharray="4 4"/>
-        <text class="small" x="330" y="345" text-anchor="middle">status update (metadata only, never the code)</text>
+        <path class="arrow-accent" d="M 185 205 H 288" stroke-width="2"/>
+        <text class="edge-label" x="237" y="192" text-anchor="middle">POST /process</text>
+        <path class="arrow" d="M 590 113 C 630 105, 635 88, 668 80" stroke-width="1.6"/>
+        <path class="arrow" d="M 590 225 C 630 215, 635 185, 668 176" stroke-width="1.6"/>
+        <path class="arrow" d="M 590 253 C 630 258, 635 266, 668 269" stroke-width="1.6"/>
+        <path class="arrow" d="M 590 309 C 630 320, 635 355, 668 364" stroke-width="1.6"/>
+        <path class="arrow" d="M 440 360 C 440 420, 240 420, 100 262" stroke-width="1.6" stroke-dasharray="5 5"/>
+        <text class="small" x="360" y="440" text-anchor="middle">status update back to the CRM — metadata only, never the code</text>
       </svg>
     </div>
   </section>
@@ -546,7 +545,7 @@
     const r = await call('GET', '/gift-cards/demo/audit');
     const ok = openModal({
       title: 'Step 7 · Audit trail',
-      explain: 'Every action you just performed left a record: action, gift card, actor, source IP, timestamp. In production this lives in BigQuery + Cloud Logging where the auditor role is read-only — the developer cannot rewrite history.',
+      explain: 'Every action you just performed left a record: action, gift card, actor, source IP, timestamp. The audit table is append-only: the application role can only INSERT and the auditor role can only SELECT — the developer cannot rewrite history.',
       result: r,
     });
     markDone('s7', ok);

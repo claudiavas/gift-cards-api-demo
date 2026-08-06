@@ -128,8 +128,8 @@ class Logger {
 
     console.log(`[${auditEntry.timestamp}] AUDIT: ${action} - GiftCard: ${giftCardId}`, metadata);
 
-    // AQUÍ: Guardar en BigQuery tabla access_logs
-    // await bigquery.table('access_logs').insert(auditEntry);
+    // AQUÍ: En producción, persistir también en la tabla access_logs
+    // via db.logAction()
 
     return auditEntry;
   }

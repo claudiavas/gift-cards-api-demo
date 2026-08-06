@@ -18,7 +18,7 @@ const router = express.Router();
 const logger = require('../utils/logger');
 const encryption = require('../utils/encryption');
 const amazonService = require('../services/amazon');
-const bigqueryService = require('../services/bigquery');
+const dbService = require('../services/db');
 const sendgridService = require('../services/sendgrid');
 const { processRateLimiter, resendRateLimiter, checkResendLimit } = require('../middleware/rateLimit');
 
@@ -69,9 +69,9 @@ async function resendExistingGiftCard(giftCard, { contactEmail, contactName, sou
     currency: giftCard.amazon_currency_code,
   });
 
-  const newResendCount = await bigqueryService.incrementResendCount(giftCard.id);
+  const newResendCount = await dbService.incrementResendCount(giftCard.id);
 
-  await bigqueryService.logAction('resent', giftCard.id, {
+  await dbService.logAction('resent', giftCard.id, {
     performed_by: 'api',
     source_ip: sourceIp,
   });
@@ -104,7 +104,7 @@ async function resendExistingGiftCard(giftCard, { contactEmail, contactName, sou
  * 3. Verificar fondos disponibles en Amazon
  * 4. Generar código en Amazon
  * 5. Encriptar código (AES-256-GCM) INMEDIATAMENTE
- * 6. Guardar en BigQuery (solo encriptado)
+ * 6. Guardar en PostgreSQL (solo encriptado)
  * 7. Enviar por email vía SendGrid
  * 8. Registrar en auditoría
  */
@@ -141,7 +141,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     // ============================================================================
     // PASO 1: Buscar si ya existe gift card para este rewardId (IDEMPOTENCIA)
     // ============================================================================
-    const existingGiftCard = await bigqueryService.findGiftCardByRewardId(rewardId);
+    const existingGiftCard = await dbService.findGiftCardByRewardId(rewardId);
 
     if (existingGiftCard) {
       logger.info('Gift card already exists, reusing existing code', {
@@ -176,7 +176,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     // En demo siempre pasa.
     const validationPassed = true;
     if (!validationPassed) {
-      await bigqueryService.logAction('validation_failed', requestId, {
+      await dbService.logAction('validation_failed', requestId, {
         failure_reason: 'Contact is not an eligible customer',
         source_ip: req.ip,
       });
@@ -195,7 +195,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     if (!hasFunds) {
       logger.error('Insufficient funds in Amazon', null, { amount, rewardId });
 
-      await bigqueryService.logAction('amazon_error', requestId, {
+      await dbService.logAction('amazon_error', requestId, {
         failure_reason: 'Insufficient funds',
         amazon_error_code: 'F300',
         source_ip: req.ip,
@@ -225,7 +225,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     } catch (error) {
       logger.error('Amazon API error', error, { rewardId, errorCode: error.code });
 
-      await bigqueryService.logAction('amazon_error', requestId, {
+      await dbService.logAction('amazon_error', requestId, {
         failure_reason: error.message,
         amazon_error_code: error.code,
         amazon_error_msg: error.message,
@@ -261,11 +261,11 @@ router.post('/process', processRateLimiter, async (req, res) => {
     }
 
     // ============================================================================
-    // PASO 6: Guardar en BigQuery (ENCRIPTADO)
+    // PASO 6: Guardar en PostgreSQL (ENCRIPTADO)
     // ============================================================================
     let giftCardId;
     try {
-      const savedCard = await bigqueryService.saveGiftCard({
+      const savedCard = await dbService.saveGiftCard({
         id: requestId,
         reward_id: rewardId,
         contact_email: contactEmail,
@@ -281,12 +281,12 @@ router.post('/process', processRateLimiter, async (req, res) => {
         creationRequestId: amazonResult.creationRequestId,
       });
 
-      await bigqueryService.logAction('generated', giftCardId, {
+      await dbService.logAction('generated', giftCardId, {
         performed_by: 'api',
         source_ip: req.ip,
       });
     } catch (error) {
-      logger.error('Error saving to BigQuery', error, { rewardId });
+      logger.error('Error saving to database', error, { rewardId });
       return res.status(500).json({ success: false, error: 'Database error' });
     }
 
@@ -304,9 +304,9 @@ router.post('/process', processRateLimiter, async (req, res) => {
         currency: currencyCode,
       });
 
-      await bigqueryService.updateEmailStatus(giftCardId, 'sent', sendResult.messageId);
+      await dbService.updateEmailStatus(giftCardId, 'sent', sendResult.messageId);
 
-      await bigqueryService.logAction('sent', giftCardId, {
+      await dbService.logAction('sent', giftCardId, {
         performed_by: 'api',
         source_ip: req.ip,
       });
@@ -377,7 +377,7 @@ router.post('/resend', resendRateLimiter, async (req, res) => {
       source_ip: req.ip,
     });
 
-    const giftCard = await bigqueryService.findGiftCardById(giftCardId);
+    const giftCard = await dbService.findGiftCardById(giftCardId);
     if (!giftCard) {
       return res.status(404).json({
         success: false,
@@ -406,21 +406,21 @@ router.post('/resend', resendRateLimiter, async (req, res) => {
  * los registros SIEMPRE contienen el código encriptado, nunca en plaintext.
  */
 if (DEMO_MODE) {
-  router.get('/demo/records', (req, res) => {
-    const snapshot = bigqueryService.getDemoSnapshot();
+  router.get('/demo/records', async (req, res) => {
+    const snapshot = await dbService.getDemoSnapshot();
     res.status(200).json({
       demoMode: true,
-      note: 'Los códigos solo se almacenan encriptados (AES-256-GCM). No existe plaintext en la base de datos.',
+      note: 'Codes are only ever stored encrypted (AES-256-GCM). No plaintext exists in the database.',
       count: snapshot.gift_cards.length,
       gift_cards: snapshot.gift_cards,
     });
   });
 
-  router.get('/demo/audit', (req, res) => {
-    const snapshot = bigqueryService.getDemoSnapshot();
+  router.get('/demo/audit', async (req, res) => {
+    const snapshot = await dbService.getDemoSnapshot();
     res.status(200).json({
       demoMode: true,
-      note: 'En producción este log vive en BigQuery + Cloud Logging (inmutable, solo lectura para el auditor).',
+      note: 'Append-only audit table: in production the app role can only INSERT and the auditor role can only SELECT.',
       count: snapshot.access_logs.length,
       access_logs: snapshot.access_logs,
     });
@@ -429,7 +429,7 @@ if (DEMO_MODE) {
   router.get('/demo/last-email', (req, res) => {
     res.status(200).json({
       demoMode: true,
-      note: 'Email simulado: en producción se envía vía SendGrid con plantilla dinámica.',
+      note: 'Simulated email: in production it is sent via SendGrid with a dynamic template.',
       email: sendgridService.lastDemoEmail,
     });
   });

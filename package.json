@@ -13,7 +13,6 @@
     "test:sanitizer": "jest tests/unit/sanitizer.test.js",
     "test:rateLimit": "jest tests/unit/rateLimit.test.js",
     "test:coverage": "jest --coverage",
-    "setup:bigquery": "node scripts/setup-bigquery.js",
     "setup:ntp": "bash scripts/ntp-sync.sh",
     "setup:scheduler": "bash scripts/cloud-scheduler-setup.sh",
     "deploy:cloudrun": "bash scripts/deploy-cloud-run.sh",
@@ -27,7 +26,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "aws4": "^1.12.0",
-    "@google-cloud/bigquery": "^7.0.0",
+    "pg": "^8.11.0",
     "@sendgrid/mail": "^8.1.0",
     "uuid": "^9.0.0",
     "dotenv": "^16.3.1",

@@ -8,7 +8,7 @@
  * - El código se desencripta SOLO EN MEMORIA para este servicio
  *
  * Flujo seguro:
- * 1. Obtener código encriptado de BigQuery
+ * 1. Obtener código encriptado de la base de datos
  * 2. Desencriptar EN MEMORIA
  * 3. Pasar a SendGrid
  * 4. Limpiar variable de memoria (= null)

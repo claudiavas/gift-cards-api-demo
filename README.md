@@ -4,7 +4,7 @@ API REST que automatiza la entrega de recompensas (referidos, promociones, fidel
 
 **🚀 Demo interactiva en vivo:** <https://gift-cards-api-production.up.railway.app>
 
-> La demo hace peticiones HTTP reales a esta API. Amazon, BigQuery y SendGrid están simulados (`DEMO_MODE`): los códigos son ficticios y no se envía ningún email real.
+> La demo hace peticiones HTTP reales a esta API. Amazon, el CRM y SendGrid están simulados (`DEMO_MODE`): los códigos son ficticios y no se envía ningún email real. La base de datos sí es real: PostgreSQL en Railway.
 
 ## El problema
 
@@ -24,19 +24,19 @@ Cualquier CRM / backoffice (scheduler diario o botón manual)
 │  ├─ Idempotencia por rewardId              │
 │  ├─ Amazon Incentives API (AWS SigV4)      │
 │  ├─ Encriptación AES-256-GCM inmediata     │
-│  ├─ BigQuery (solo códigos encriptados)    │
+│  ├─ PostgreSQL (solo códigos encriptados)  │
 │  ├─ SendGrid (email al destinatario)       │
-│  └─ Auditoría inmutable (Cloud Logging)    │
+│  └─ Auditoría append-only (inmutable)      │
 └─────────────────────────────────────────────┘
 ```
 
 - **Backend:** Node.js + Express
-- **BD:** Google BigQuery (códigos siempre encriptados)
-- **Auditoría:** BigQuery + Cloud Logging (inmutable, rol de auditor de solo lectura)
+- **BD:** PostgreSQL (códigos siempre encriptados; UNIQUE constraints = idempotencia garantizada por la BD)
+- **Auditoría:** tabla append-only en PostgreSQL (el rol de la app solo INSERT, el auditor solo SELECT)
 - **Email:** SendGrid con plantillas dinámicas
 - **Autenticación con Amazon:** AWS Signature V4
 - **Encriptación:** AES-256-GCM
-- **Infra:** Docker, Cloud Run, GitHub Actions (CI)
+- **Infra:** Docker, Railway (demo en vivo) / Cloud Run, GitHub Actions (CI)
 
 ## Decisiones de seguridad
 
@@ -46,6 +46,19 @@ Cualquier CRM / backoffice (scheduler diario o botón manual)
 4. **Auditoría independiente** — el log de accesos es inmutable; la empresa audita qué pasó con cada código sin depender del desarrollador.
 5. **Rate limiting** — límites por API key/IP y reglas de reenvío: máximo 1/hora, 3/día, 5 en total por tarjeta.
 6. **Manejo de errores de Amazon** — F300 (fondos), F400 (temporal), etc. se traducen a estrategias distintas: backoff exponencial, alerta al CRM o fallo controlado.
+
+## Decisiones y trade-offs
+
+**¿Por qué PostgreSQL?** El workload es OLTP puro: pocas filas, búsquedas puntuales por `rewardId`, y una regla de negocio que debe ser inviolable — una recompensa, una tarjeta. Los constraints `UNIQUE (reward_id)` y `UNIQUE (creation_request_id)` hacen que la idempotencia la garantice la base de datos, no la aplicación: dos requests concurrentes con el mismo reward no pueden generar (ni pagar) dos tarjetas, sin race conditions posibles. Una base analítica (BigQuery, etc.) no impone constraints y penaliza los UPDATE; aquí sería la herramienta equivocada.
+
+**¿Por qué proveedores concretos y no abstracciones?** Amazon Incentives, SendGrid y PostgreSQL están acoplados a propósito: las peculiaridades reales (AWS SigV4 con reloj NTP, códigos de error F-xxx, `ON CONFLICT`) son donde vive la ingeniería. Pero cada proveedor está aislado en su propio servicio (`amazon.js`, `sendgrid.js`, `db.js`), así que cambiar uno es tocar un archivo. El CRM sí es genérico (`crm.js`) porque es quien llama a la API, no una dependencia interna.
+
+**Auditoría inmutable por permisos** — la tabla `access_logs` es append-only: en producción el rol de la aplicación solo tiene `INSERT` y el rol auditor solo `SELECT` (ver [`sql/create_tables.sql`](sql/create_tables.sql)). Ni siquiera el desarrollador puede reescribir la historia.
+
+## Despliegue
+
+- **Demo en vivo:** [Railway](https://railway.com) — servicio Node + PostgreSQL gestionado, con `DEMO_MODE=true`. Los datos de la demo persisten de verdad en Postgres (se purgan a los 7 días).
+- **Producción:** cualquier plataforma de contenedores — el `Dockerfile` multi-stage funciona igual en Cloud Run, Railway o Fly.io. CI con GitHub Actions ([`.github/workflows/`](.github/workflows/)).
 
 ## Endpoints
 
@@ -90,7 +103,7 @@ src/
 │   └── giftCards.js      # Endpoints process / resend / demo
 ├── services/
 │   ├── amazon.js         # Amazon Incentives API (AWS SigV4, reintentos)
-│   ├── bigquery.js       # Persistencia + auditoría (in-memory en demo)
+│   ├── db.js             # PostgreSQL: persistencia + auditoría (fallback in-memory)
 │   ├── sendgrid.js       # Email (simulado en demo)
 │   └── crm.js            # Integración genérica con el CRM de origen
 └── utils/
