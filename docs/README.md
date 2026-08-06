@@ -50,7 +50,7 @@ Diagrama visual de la arquitectura de seguridad:
 
 **Fecha objetivo:** 10 de junio 2026
 **Status:** En planificación
-**Responsable:** Maria Vasquez (claudia.vasquez.as@gmail.com)
+**Responsable:** Claudia Vásquez (claudia.vasquez.as@gmail.com)
 
 ---
 

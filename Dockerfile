@@ -18,7 +18,7 @@ RUN npm ci --only=production
 FROM node:18-alpine
 
 # Metadatos
-LABEL maintainer="Maria Vasquez <claudia.vasquez.as@gmail.com>"
+LABEL maintainer="Claudia Vásquez <claudia.vasquez.as@gmail.com>"
 LABEL description="Gift Cards API - Amazon tarjetas regalo seguras con encriptación"
 
 WORKDIR /app

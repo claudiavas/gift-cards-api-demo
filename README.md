@@ -100,4 +100,4 @@ src/
 
 ---
 
-Proyecto diseñado, implementado y documentado por **María Vásquez** ([claudia.vasquez.as@gmail.com](mailto:claudia.vasquez.as@gmail.com)). El plan de implementación completo (4 semanas, sprints con scoring fibonacci) está en [`docs/`](docs/).
+Proyecto diseñado, implementado y documentado por **Claudia Vásquez** ([claudia.vasquez.as@gmail.com](mailto:claudia.vasquez.as@gmail.com)). El plan de implementación completo (4 semanas, sprints con scoring fibonacci) está en [`docs/`](docs/).

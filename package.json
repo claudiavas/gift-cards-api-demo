@@ -22,7 +22,7 @@
     "docker:stop": "docker-compose down"
   },
   "keywords": ["amazon", "gift-cards", "encryption", "bigquery", "security"],
-  "author": "Maria Vasquez <claudia.vasquez.as@gmail.com>",
+  "author": "Claudia Vásquez <claudia.vasquez.as@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
