@@ -47,20 +47,20 @@
   header { padding: 4rem 0 2.5rem; text-align: center; }
   header h1 { font-size: 2.4rem; letter-spacing: -0.02em; }
   header h1 span { color: var(--accent); }
-  header p.tagline { color: var(--muted); max-width: 660px; margin: 0.75rem auto 0; font-size: 1.05rem; }
+  header p.tagline { color: var(--muted); margin: 0.75rem auto 0; font-size: 1.05rem; }
   .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
   .badge {
     font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 99px;
     background: var(--accent-soft); color: var(--accent);
   }
   .demo-banner {
-    margin: 1.5rem auto 0; max-width: 660px; font-size: 0.85rem; color: var(--muted);
+    margin: 0 0 1.25rem; font-size: 0.85rem; color: var(--muted);
     border: 1px dashed var(--border); border-radius: 10px; padding: 0.6rem 1rem;
   }
 
   section { margin: 3rem 0; }
   h2 { font-size: 1.4rem; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.25rem; max-width: 720px; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
 
   /* Diagram */
   .diagram-box {
@@ -180,10 +180,6 @@
     <span class="badge">SendGrid</span>
     <span class="badge">Docker + CI</span>
   </div>
-  <div class="demo-banner" id="demoBanner">
-    🧪 <strong>Demo mode:</strong> every button below fires a real HTTP request against this API.
-    Amazon, the CRM and SendGrid are simulated — codes are fake and no actual email is sent.
-  </div>
 </header>
 
 <main class="wrap">
@@ -261,9 +257,12 @@
   <section>
     <h2>Try it — walk the pipeline</h2>
     <p class="sub">
-      Press each step in order. Every step fires a real request against this API and opens a popup
-      with the exact HTTP call and the server's live response.
+      Press each step in order: each one opens a popup with the exact HTTP call and the server's live response.
     </p>
+    <div class="demo-banner" id="demoBanner">
+      🧪 <strong>Demo mode:</strong> the requests are real, but Amazon, the CRM and SendGrid are
+      simulated — codes are fake and no actual email is sent.
+    </div>
 
     <div class="config">
       <div>
