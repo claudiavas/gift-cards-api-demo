@@ -17,7 +17,7 @@
 CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.gift_cards` (
   -- Identificadores
   id STRING NOT NULL DESCRIPTION "UUID único de la tarjeta",
-  referido_id STRING NOT NULL DESCRIPTION "ID del módulo Referidos en Zoho (ÚNICO - una tarjeta por referido)",
+  reward_id STRING NOT NULL DESCRIPTION "ID del módulo Referidos en Zoho (ÚNICO - una tarjeta por referido)",
 
   -- Información del destinatario
   contact_email STRING NOT NULL DESCRIPTION "Email del alumno (inmutable - no cambiar después)",
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.gift_cards` (
 );
 
 -- Constraints (comentados porque BigQuery no soporta en CREATE TABLE)
--- CONSTRAINT referido_id_unique UNIQUE (referido_id)
+-- CONSTRAINT reward_id_unique UNIQUE (reward_id)
 -- CONSTRAINT creation_request_id_unique UNIQUE (amazon_creation_request_id)
 
 -- ============================================================================
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.access_logs` (
 
 CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.gift_cards_clustered` (
   id STRING NOT NULL,
-  referido_id STRING NOT NULL,
+  reward_id STRING NOT NULL,
   contact_email STRING NOT NULL,
   amazon_code_encrypted STRING NOT NULL,
   amazon_creation_request_id STRING NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.gift_cards_clustered` (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
 )
-CLUSTER BY referido_id, created_at;
+CLUSTER BY reward_id, created_at;
 
 -- ============================================================================
 -- Tabla de cambios (Change Data Capture)
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `PROJECT_ID.DATASET_ID.gift_cards_changes` (
 CREATE OR REPLACE VIEW `PROJECT_ID.DATASET_ID.unsent_cards` AS
 SELECT
   id,
-  referido_id,
+  reward_id,
   contact_email,
   created_at,
   TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, HOUR) as hours_since_creation
@@ -146,7 +146,7 @@ ORDER BY created_at DESC;
 CREATE OR REPLACE VIEW `PROJECT_ID.DATASET_ID.excessive_resends` AS
 SELECT
   id,
-  referido_id,
+  reward_id,
   contact_email,
   email_resent_count,
   email_last_resent_at,

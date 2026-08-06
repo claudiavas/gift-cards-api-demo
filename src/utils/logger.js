@@ -4,7 +4,7 @@
  * IMPORTANTE: Este logger NUNCA debe registrar:
  * - Códigos de tarjetas regalo (amazon codes)
  * - Claves AWS (AKIA...)
- * - Tokens de API (SendGrid, Zoho, etc)
+ * - Tokens de API (SendGrid, CRM, etc)
  * - Información de encriptación
  *
  * El sanitizer se encarga de limpiar logs antes de enviarlos a Cloud Logging

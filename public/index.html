@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gift Cards API — Demo interactiva</title>
+<title>Gift Cards API — Live interactive demo</title>
 <style>
   :root {
     --bg: #f6f7fb;
@@ -47,92 +47,113 @@
   header { padding: 4rem 0 2.5rem; text-align: center; }
   header h1 { font-size: 2.4rem; letter-spacing: -0.02em; }
   header h1 span { color: var(--accent); }
-  header p.tagline { color: var(--muted); max-width: 640px; margin: 0.75rem auto 0; font-size: 1.05rem; }
+  header p.tagline { color: var(--muted); max-width: 660px; margin: 0.75rem auto 0; font-size: 1.05rem; }
   .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
   .badge {
     font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 99px;
-    background: var(--accent-soft); color: var(--accent); border: 1px solid transparent;
+    background: var(--accent-soft); color: var(--accent);
   }
   .demo-banner {
-    margin: 1.5rem auto 0; max-width: 640px; font-size: 0.85rem; color: var(--muted);
+    margin: 1.5rem auto 0; max-width: 660px; font-size: 0.85rem; color: var(--muted);
     border: 1px dashed var(--border); border-radius: 10px; padding: 0.6rem 1rem;
   }
 
-  section { margin: 2.5rem 0; }
-  h2 { font-size: 1.35rem; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
+  section { margin: 3rem 0; }
+  h2 { font-size: 1.4rem; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.25rem; max-width: 720px; }
 
-  /* Flujo */
-  .flow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch; }
-  .flow .step {
-    flex: 1 1 130px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 0.8rem; text-align: center; position: relative;
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-  .flow .step .icon { font-size: 1.4rem; }
-  .flow .step .name { font-weight: 700; font-size: 0.82rem; margin-top: 0.2rem; }
-  .flow .step .desc { font-size: 0.72rem; color: var(--muted); }
-  .flow .step.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-
-  /* Playground */
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-  .card {
+  /* Diagram */
+  .diagram-box {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
+    padding: 1rem; overflow-x: auto;
   }
-  .card.wide { grid-column: 1 / -1; }
-  .card h3 { font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-  .card p.hint { font-size: 0.85rem; color: var(--muted); }
-  .method {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.72rem; font-weight: 700;
-    padding: 0.15rem 0.5rem; border-radius: 6px; background: var(--accent-soft); color: var(--accent);
+  .diagram-box svg { display: block; min-width: 720px; width: 100%; height: auto; }
+  .diagram-box .node { fill: var(--bg); stroke: var(--border); }
+  .diagram-box .node-api { fill: var(--accent-soft); stroke: var(--accent); }
+  .diagram-box text { fill: var(--text); font-family: inherit; }
+  .diagram-box .label { font-size: 12px; font-weight: 700; }
+  .diagram-box .small { font-size: 10px; fill: var(--muted); font-weight: 400; }
+  .diagram-box .edge-label { font-size: 10px; fill: var(--accent); font-weight: 600; }
+  .diagram-box .arrow { stroke: var(--muted); fill: none; marker-end: url(#arr); }
+  .diagram-box .arrow-accent { stroke: var(--accent); fill: none; marker-end: url(#arrA); }
+
+  /* Pipeline */
+  .config {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1rem 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;
+    margin-bottom: 1.25rem;
   }
-  label { font-size: 0.8rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 0.2rem; }
+  .config > div { flex: 1 1 150px; }
+  label { font-size: 0.78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 0.2rem; }
   input, select {
     width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--border); border-radius: 8px;
     background: var(--bg); color: var(--text); font-size: 0.9rem;
   }
-  .row { display: flex; gap: 0.75rem; }
-  .row > div { flex: 1; }
-  .checkline { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
-  .checkline input { width: auto; }
-  button {
-    align-self: flex-start; background: var(--accent); color: #fff; border: none; cursor: pointer;
-    padding: 0.55rem 1.1rem; border-radius: 9px; font-size: 0.9rem; font-weight: 600;
-    transition: opacity 0.15s;
+  .btn {
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    padding: 0.55rem 1rem; border-radius: 9px; font-size: 0.88rem; font-weight: 600;
   }
-  button:hover { opacity: 0.88; }
-  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-  button:disabled { opacity: 0.5; cursor: wait; }
+  .btn:hover { opacity: 0.88; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
 
-  .status { font-size: 0.8rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 6px; display: none; }
-  .status.ok { display: inline-block; background: var(--ok-soft); color: var(--ok); }
-  .status.err { display: inline-block; background: var(--err-soft); color: var(--err); }
+  .pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+  .pstep {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1rem 1.1rem; cursor: pointer; text-align: left; position: relative;
+    transition: border-color 0.2s, transform 0.1s; font: inherit; color: inherit;
+  }
+  .pstep:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .pstep .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.6rem; height: 1.6rem; border-radius: 50%; font-size: 0.8rem; font-weight: 700;
+    background: var(--accent-soft); color: var(--accent); margin-bottom: 0.4rem;
+  }
+  .pstep.done .num { background: var(--ok-soft); color: var(--ok); }
+  .pstep h3 { font-size: 0.95rem; }
+  .pstep p { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+  .pstep .tag {
+    position: absolute; top: 0.85rem; right: 0.9rem; font-size: 0.68rem; font-weight: 700;
+    font-family: ui-monospace, Menlo, monospace; color: var(--muted);
+  }
+  .pstep.done .tag { color: var(--ok); }
 
-  pre.output {
+  /* Modal */
+  .overlay {
+    display: none; position: fixed; inset: 0; background: rgba(10, 12, 20, 0.55);
+    z-index: 50; padding: 1.25rem; overflow-y: auto;
+  }
+  .overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    max-width: 680px; width: 100%; margin: 3vh auto; padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 0.9rem;
+  }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .modal-head h3 { font-size: 1.1rem; }
+  .modal-head .close {
+    background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1;
+  }
+  .modal .explain { font-size: 0.88rem; color: var(--muted); }
+  .modal .lbl { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .status-chip { font-size: 0.8rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 6px; }
+  .status-chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .status-chip.err { background: var(--err-soft); color: var(--err); }
+  pre.code {
     background: var(--code-bg); color: var(--code-text); border-radius: 10px;
-    padding: 0.9rem 1rem; font-size: 0.78rem; overflow-x: auto; display: none;
+    padding: 0.85rem 1rem; font-size: 0.76rem; overflow-x: auto;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.5;
-    max-height: 340px; overflow-y: auto;
+    max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
   }
-  pre.output.visible { display: block; }
-  .reqline { font-size: 0.75rem; color: var(--muted); font-family: ui-monospace, Menlo, monospace; display: none; }
-  .reqline.visible { display: block; }
-
-  /* Email preview */
-  .email-preview {
-    display: none; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-  }
-  .email-preview.visible { display: block; }
+  .email-preview { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .email-preview .mail-head { background: var(--bg); padding: 0.7rem 1rem; font-size: 0.8rem; color: var(--muted); border-bottom: 1px solid var(--border); }
   .email-preview .mail-body { padding: 1.25rem 1rem; text-align: center; }
-  .email-preview .code {
+  .email-preview .code-chip {
     display: inline-block; margin: 0.75rem 0; padding: 0.6rem 1.2rem; border-radius: 10px;
     background: var(--accent-soft); color: var(--accent); font-family: ui-monospace, Menlo, monospace;
     font-weight: 700; font-size: 1.05rem; letter-spacing: 0.05em;
   }
 
-  /* Seguridad */
+  /* Security */
   .sec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
   .sec-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
   .sec-item h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
@@ -147,8 +168,9 @@
 <header class="wrap">
   <h1>🎁 Gift Cards <span>API</span></h1>
   <p class="tagline">
-    API REST que automatiza un programa de recompensas por referidos: genera tarjetas regalo de Amazon,
-    las encripta con AES-256-GCM, las entrega por email y deja una pista de auditoría inmutable.
+    A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them with
+    AES-256-GCM, delivers them by email and keeps an immutable audit trail. Any CRM or backoffice
+    can trigger it — rewards for referrals, promotions, loyalty programs or anything else.
   </p>
   <div class="badges">
     <span class="badge">Node.js + Express</span>
@@ -160,137 +182,172 @@
     <span class="badge">Docker + CI</span>
   </div>
   <div class="demo-banner" id="demoBanner">
-    🧪 <strong>Modo demostración:</strong> las llamadas que haces aquí son peticiones HTTP reales a esta API.
-    Amazon, BigQuery y SendGrid están simulados — los códigos son ficticios y ningún email se envía de verdad.
+    🧪 <strong>Demo mode:</strong> every button below fires a real HTTP request against this API.
+    Amazon, BigQuery and SendGrid are simulated — codes are fake and no actual email is sent.
   </div>
 </header>
 
 <main class="wrap">
 
   <section>
-    <h2>Cómo funciona</h2>
-    <p class="sub">Cada petición recorre este pipeline. Al lanzar una llamada desde el playground, verás iluminarse los pasos ejecutados.</p>
-    <div class="flow" id="flow">
-      <div class="step" data-step="auth"><div class="icon">🔑</div><div class="name">Autenticación</div><div class="desc">x-api-key + rate limit</div></div>
-      <div class="step" data-step="idem"><div class="icon">🔁</div><div class="name">Idempotencia</div><div class="desc">¿ya existe la tarjeta?</div></div>
-      <div class="step" data-step="amazon"><div class="icon">🛒</div><div class="name">Amazon</div><div class="desc">genera el código<br>(AWS SigV4)</div></div>
-      <div class="step" data-step="crypt"><div class="icon">🔐</div><div class="name">Encriptación</div><div class="desc">AES-256-GCM inmediata</div></div>
-      <div class="step" data-step="db"><div class="icon">🗄️</div><div class="name">BigQuery</div><div class="desc">solo se guarda encriptado</div></div>
-      <div class="step" data-step="mail"><div class="icon">✉️</div><div class="name">SendGrid</div><div class="desc">email al destinatario</div></div>
-      <div class="step" data-step="audit"><div class="icon">📋</div><div class="name">Auditoría</div><div class="desc">log inmutable</div></div>
+    <h2>How it works</h2>
+    <p class="sub">
+      A CRM detects that a customer earned a reward and calls the API with a unique
+      <code>rewardId</code>. The API validates the contact against the CRM, generates the gift card,
+      encrypts the code before it touches any storage, emails it to the recipient, and records
+      every action in an audit log the developer cannot alter.
+    </p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 900 380" role="img" aria-label="Architecture diagram of the Gift Cards API">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--muted)"/>
+          </marker>
+          <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" style="color: var(--accent)"/>
+          </marker>
+        </defs>
+
+        <!-- CRM -->
+        <rect class="node" x="20" y="130" width="150" height="90" rx="12"/>
+        <text class="label" x="95" y="165" text-anchor="middle">Any CRM /</text>
+        <text class="label" x="95" y="181" text-anchor="middle">backoffice</text>
+        <text class="small" x="95" y="201" text-anchor="middle">daily scheduler or button</text>
+
+        <!-- API -->
+        <rect class="node node-api" x="280" y="60" width="240" height="230" rx="14"/>
+        <text class="label" x="400" y="88" text-anchor="middle">Gift Cards API (Node.js)</text>
+        <text class="small" x="300" y="118">1 · API-key auth + rate limiting</text>
+        <text class="small" x="300" y="140">2 · Idempotency check (rewardId)</text>
+        <text class="small" x="300" y="162">3 · Customer validation via CRM</text>
+        <text class="small" x="300" y="184">4 · Generate code (AWS SigV4)</text>
+        <text class="small" x="300" y="206">5 · Encrypt AES-256-GCM in memory</text>
+        <text class="small" x="300" y="228">6 · Store ciphertext only</text>
+        <text class="small" x="300" y="250">7 · Email the recipient</text>
+        <text class="small" x="300" y="272">8 · Append to audit log</text>
+
+        <!-- Amazon -->
+        <rect class="node" x="640" y="40" width="230" height="64" rx="12"/>
+        <text class="label" x="755" y="67" text-anchor="middle">Amazon Incentives API</text>
+        <text class="small" x="755" y="86" text-anchor="middle">creates the gift card code</text>
+
+        <!-- SendGrid -->
+        <rect class="node" x="640" y="128" width="230" height="64" rx="12"/>
+        <text class="label" x="755" y="155" text-anchor="middle">SendGrid</text>
+        <text class="small" x="755" y="174" text-anchor="middle">delivers code to the customer</text>
+
+        <!-- BigQuery -->
+        <rect class="node" x="640" y="216" width="230" height="64" rx="12"/>
+        <text class="label" x="755" y="243" text-anchor="middle">BigQuery</text>
+        <text class="small" x="755" y="262" text-anchor="middle">encrypted codes only — no plaintext</text>
+
+        <!-- Audit -->
+        <rect class="node" x="640" y="304" width="230" height="64" rx="12"/>
+        <text class="label" x="755" y="331" text-anchor="middle">Immutable audit log</text>
+        <text class="small" x="755" y="350" text-anchor="middle">read-only auditor role</text>
+
+        <!-- edges -->
+        <path class="arrow-accent" d="M 170 165 H 280" stroke-width="1.5"/>
+        <text class="edge-label" x="225" y="155" text-anchor="middle">POST /gift-cards/process</text>
+        <path class="arrow" d="M 520 110 C 580 100, 590 80, 640 74" stroke-width="1.2"/>
+        <path class="arrow" d="M 520 200 C 580 190, 590 170, 640 160" stroke-width="1.2"/>
+        <path class="arrow" d="M 520 240 C 580 240, 590 246, 640 248" stroke-width="1.2"/>
+        <path class="arrow" d="M 520 275 C 580 290, 590 325, 640 334" stroke-width="1.2"/>
+        <path class="arrow" d="M 400 290 C 400 340, 260 350, 172 220 M 172 220 L 170 218" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <text class="small" x="330" y="345" text-anchor="middle">status update (metadata only, never the code)</text>
+      </svg>
     </div>
   </section>
 
   <section>
-    <h2>Playground</h2>
-    <p class="sub">Prueba la API en vivo. Cada tarjeta muestra la petición exacta y la respuesta JSON real del servidor.</p>
+    <h2>Try it — walk the pipeline</h2>
+    <p class="sub">
+      Press each step in order. Every step fires a real request against this API and opens a popup
+      with the exact HTTP call and the server's live response.
+    </p>
 
-    <div class="grid">
-
-      <div class="card">
-        <h3><span class="method">GET</span> /health <span class="status" id="st-health"></span></h3>
-        <p class="hint">Health check público (lo usa la plataforma de despliegue para vigilar el servicio).</p>
-        <button onclick="callHealth()">Comprobar estado</button>
-        <div class="reqline" id="rq-health"></div>
-        <pre class="output" id="out-health"></pre>
+    <div class="config">
+      <div>
+        <label for="f-name">Recipient name</label>
+        <input id="f-name" value="Ada Lovelace">
       </div>
-
-      <div class="card">
-        <h3><span class="method">POST</span> /gift-cards/process <span class="status" id="st-auth"></span></h3>
-        <p class="hint">Sin la cabecera <code>x-api-key</code> la API rechaza la petición. Compruébalo:</p>
-        <button class="secondary" onclick="callWithoutKey()">Llamar sin API key → 401</button>
-        <div class="reqline" id="rq-auth"></div>
-        <pre class="output" id="out-auth"></pre>
+      <div>
+        <label for="f-email">Recipient email</label>
+        <input id="f-email" value="ada@example.com">
       </div>
-
-      <div class="card wide">
-        <h3><span class="method">POST</span> /gift-cards/process <span class="status" id="st-process"></span></h3>
-        <p class="hint">
-          Genera una tarjeta regalo para un referido. Si vuelves a llamar con el <strong>mismo ID de referido</strong>,
-          la API no genera otro código: reenvía el existente (idempotencia).
-        </p>
-        <div class="row">
-          <div>
-            <label for="f-name">Nombre del destinatario</label>
-            <input id="f-name" value="Ada Lovelace">
-          </div>
-          <div>
-            <label for="f-email">Email</label>
-            <input id="f-email" value="ada@example.com">
-          </div>
-          <div>
-            <label for="f-amount">Importe</label>
-            <select id="f-amount">
-              <option value="2500">25,00 €</option>
-              <option value="5000" selected>50,00 €</option>
-              <option value="10000">100,00 €</option>
-            </select>
-          </div>
-          <div>
-            <label for="f-referido">ID de referido</label>
-            <input id="f-referido" readonly>
-          </div>
-        </div>
-        <div class="row">
-          <button onclick="callProcess()">🎁 Generar y enviar tarjeta</button>
-          <button class="secondary" onclick="newReferido()">Nuevo referido (reinicia idempotencia)</button>
-        </div>
-        <div class="reqline" id="rq-process"></div>
-        <pre class="output" id="out-process"></pre>
+      <div>
+        <label for="f-amount">Amount</label>
+        <select id="f-amount">
+          <option value="2500">€25.00</option>
+          <option value="5000" selected>€50.00</option>
+          <option value="10000">€100.00</option>
+        </select>
       </div>
-
-      <div class="card">
-        <h3>✉️ Email simulado <span class="status" id="st-email"></span></h3>
-        <p class="hint">Así se vería el email que recibiría el destinatario (vía <code>GET /gift-cards/demo/last-email</code>).</p>
-        <button onclick="callLastEmail()">Ver último email</button>
-        <div class="email-preview" id="emailPreview">
-          <div class="mail-head" id="emailHead"></div>
-          <div class="mail-body">
-            <div id="emailGreeting"></div>
-            <div id="emailMsg" style="color: var(--muted); font-size: 0.9rem;"></div>
-            <div class="code" id="emailCode"></div>
-            <div id="emailAmount" style="font-weight:700;"></div>
-          </div>
-        </div>
-        <pre class="output" id="out-email"></pre>
+      <div>
+        <label for="f-reward">rewardId (idempotency key)</label>
+        <input id="f-reward" readonly>
       </div>
-
-      <div class="card">
-        <h3>🗄️ Base de datos <span class="status" id="st-records"></span></h3>
-        <p class="hint">
-          Los registros almacenados: fíjate en <code>amazon_code_encrypted</code> — el código
-          <strong>nunca existe en plaintext</strong> en la base de datos.
-        </p>
-        <button onclick="callRecords()">Ver registros encriptados</button>
-        <div class="reqline" id="rq-records"></div>
-        <pre class="output" id="out-records"></pre>
+      <div style="flex: 0 0 auto;">
+        <button class="btn ghost" onclick="newReward()">↻ New rewardId</button>
       </div>
+    </div>
 
-      <div class="card wide">
-        <h3>📋 Auditoría inmutable <span class="status" id="st-audit"></span></h3>
-        <p class="hint">
-          Cada acción queda registrada: quién, cuándo, desde qué IP y con qué resultado.
-          En producción este log vive en Cloud Logging con un rol de solo lectura para el auditor —
-          ni siquiera el desarrollador puede alterarlo.
-        </p>
-        <button onclick="callAudit()">Ver log de auditoría</button>
-        <div class="reqline" id="rq-audit"></div>
-        <pre class="output" id="out-audit"></pre>
-      </div>
-
+    <div class="pipeline">
+      <button class="pstep" id="s1" onclick="step1()">
+        <span class="tag">401</span>
+        <span class="num">1</span>
+        <h3>🔑 Authentication</h3>
+        <p>Call without an API key and watch the API reject it.</p>
+      </button>
+      <button class="pstep" id="s2" onclick="step2()">
+        <span class="tag">POST</span>
+        <span class="num">2</span>
+        <h3>🎁 Generate &amp; send</h3>
+        <p>Full pipeline: validate, generate, encrypt, store, email, audit.</p>
+      </button>
+      <button class="pstep" id="s3" onclick="step3()">
+        <span class="tag">POST</span>
+        <span class="num">3</span>
+        <h3>🔁 Idempotency</h3>
+        <p>Same rewardId again — no second card, the existing one is resent.</p>
+      </button>
+      <button class="pstep" id="s4" onclick="step4()">
+        <span class="tag">GET</span>
+        <span class="num">4</span>
+        <h3>🗄️ Encrypted storage</h3>
+        <p>Inspect the database: ciphertext only, never plaintext.</p>
+      </button>
+      <button class="pstep" id="s5" onclick="step5()">
+        <span class="tag">GET</span>
+        <span class="num">5</span>
+        <h3>✉️ The email</h3>
+        <p>Preview the (simulated) email the customer would receive.</p>
+      </button>
+      <button class="pstep" id="s6" onclick="step6()">
+        <span class="tag">POST</span>
+        <span class="num">6</span>
+        <h3>📮 Manual resend</h3>
+        <p>Resend by giftCardId — capped at 5 resends per card.</p>
+      </button>
+      <button class="pstep" id="s7" onclick="step7()">
+        <span class="tag">GET</span>
+        <span class="num">7</span>
+        <h3>📋 Audit trail</h3>
+        <p>Every action, who did it, from which IP — immutable.</p>
+      </button>
     </div>
   </section>
 
   <section>
-    <h2>Decisiones de seguridad</h2>
-    <p class="sub">El diseño parte de una premisa: ni la base de datos, ni los logs, ni el propio desarrollador deben poder ver un código de tarjeta.</p>
+    <h2>Security decisions</h2>
+    <p class="sub">The design starts from one premise: a gift card code is bearer money, so neither the database, nor the logs, nor the developer should ever see one.</p>
     <div class="sec-grid">
-      <div class="sec-item"><h4>🔐 Encriptación inmediata</h4><p>El código se encripta con AES-256-GCM en el instante en que Amazon lo devuelve. Solo se desencripta en memoria, justo antes de componer el email, y la variable se anula después.</p></div>
-      <div class="sec-item"><h4>🧹 Sanitización de logs</h4><p>Un middleware intercepta todo lo que va a los logs y redacta códigos de tarjeta, claves AWS, tokens de API y emails mediante patrones regex.</p></div>
-      <div class="sec-item"><h4>🔁 Idempotencia</h4><p>Un <code>creationRequestId</code> único y un constraint sobre el referido garantizan que un reintento del scheduler nunca genere (ni pague) dos tarjetas.</p></div>
-      <div class="sec-item"><h4>📋 Auditoría independiente</h4><p>El log de accesos es inmutable y el rol de auditor es de solo lectura: la empresa puede verificar qué pasó con cada código sin depender del desarrollador.</p></div>
-      <div class="sec-item"><h4>🚦 Rate limiting</h4><p>Límites por API key e IP, y reglas específicas de reenvío: máximo 1 por hora, 3 al día y 5 en total por tarjeta.</p></div>
-      <div class="sec-item"><h4>🛡️ Manejo de errores de Amazon</h4><p>Los códigos de error (F300 fondos, F400 temporal…) se traducen a estrategias distintas: reintento con backoff exponencial, alerta al CRM o fallo controlado.</p></div>
+      <div class="sec-item"><h4>🔐 Immediate encryption</h4><p>The code is encrypted with AES-256-GCM the instant Amazon returns it. It is only decrypted in memory, right before composing the email, and the variable is nulled afterwards.</p></div>
+      <div class="sec-item"><h4>🧹 Log sanitization</h4><p>A middleware intercepts everything headed to the logs and redacts gift card codes, AWS keys, API tokens and emails using regex patterns — covered by unit tests.</p></div>
+      <div class="sec-item"><h4>🔁 Idempotency</h4><p>A unique <code>creationRequestId</code> plus a constraint on <code>rewardId</code> guarantee a scheduler retry can never generate (and pay for) two cards.</p></div>
+      <div class="sec-item"><h4>📋 Independent audit</h4><p>The access log is immutable and the auditor role is read-only: the business can verify what happened to every code without trusting the developer.</p></div>
+      <div class="sec-item"><h4>🚦 Rate limiting</h4><p>Limits per API key and IP, plus resend rules: at most 1 per hour, 3 per day and 5 in total per card.</p></div>
+      <div class="sec-item"><h4>🛡️ Amazon error handling</h4><p>Error codes (F300 funds, F400 temporary…) map to different strategies: exponential-backoff retry, CRM alert, or controlled failure.</p></div>
     </div>
   </section>
 
@@ -298,142 +355,201 @@
 
 <footer>
   <div class="wrap">
-    Proyecto de <strong>María Vásquez</strong> · Node.js · diseñado, implementado y documentado de extremo a extremo.
-    <br>El código de esta demo está en <a href="https://github.com/claudiavas/gift-cards-api-demo" target="_blank" rel="noopener">GitHub</a>.
+    A project by <strong>María Vásquez</strong> · Node.js · designed, built and documented end to end.
+    <br>Source code on <a href="https://github.com/claudiavas/gift-cards-api-demo" target="_blank" rel="noopener">GitHub</a>.
   </div>
 </footer>
 
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if (event.target === this) closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="m-title"></h3>
+      <button class="close" onclick="closeModal()" aria-label="Close">×</button>
+    </div>
+    <p class="explain" id="m-explain"></p>
+    <div>
+      <div class="lbl">Request</div>
+      <pre class="code" id="m-request"></pre>
+    </div>
+    <div>
+      <div class="lbl">Response <span class="status-chip" id="m-status"></span></div>
+      <pre class="code" id="m-response"></pre>
+    </div>
+    <div id="m-extra"></div>
+  </div>
+</div>
+
 <script>
   let API_KEY = null;
+  const state = { giftCardId: null };
 
-  // Obtener la API key de demo del servidor
   fetch('/demo-config')
     .then(r => r.json())
     .then(cfg => {
       API_KEY = cfg.apiKey;
       if (!cfg.demoMode) {
         document.getElementById('demoBanner').textContent =
-          '⚠️ Esta instancia no está en modo demo: el playground requiere una API key real.';
+          '⚠️ This instance is not running in demo mode: the playground requires a real API key.';
       }
     })
     .catch(() => {});
 
-  function newReferido() {
-    const id = 'REF-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-    document.getElementById('f-referido').value = id;
+  function newReward() {
+    document.getElementById('f-reward').value =
+      'RWD-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    state.giftCardId = null;
+    ['s2', 's3', 's6'].forEach(id => document.getElementById(id).classList.remove('done'));
   }
-  newReferido();
+  newReward();
 
-  function show(id, cls, text) {
-    const el = document.getElementById(id);
-    el.className = 'status ' + cls;
-    el.textContent = text;
-  }
-
-  function highlight(steps) {
-    document.querySelectorAll('.flow .step').forEach(s => s.classList.remove('active'));
-    steps.forEach((name, i) => {
-      setTimeout(() => {
-        const el = document.querySelector('.flow .step[data-step="' + name + '"]');
-        if (el) el.classList.add('active');
-      }, i * 180);
-    });
-  }
-
-  async function call(method, url, { body, useKey } = {}) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (useKey && API_KEY) headers['x-api-key'] = API_KEY;
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    let data;
-    try { data = await res.json(); } catch { data = null; }
-    return { status: res.status, data };
-  }
-
-  function render(prefix, method, url, result, { headers } = {}) {
-    const rq = document.getElementById('rq-' + prefix);
-    if (rq) {
-      rq.textContent = '→ ' + method + ' ' + url + (headers ? '   [' + headers + ']' : '');
-      rq.classList.add('visible');
-    }
-    const out = document.getElementById('out-' + prefix);
-    out.textContent = 'HTTP ' + result.status + '\n' + JSON.stringify(result.data, null, 2);
-    out.classList.add('visible');
-    const okStatus = result.status >= 200 && result.status < 300;
-    show('st-' + prefix, okStatus ? 'ok' : 'err', 'HTTP ' + result.status);
-  }
-
-  async function callHealth() {
-    const r = await call('GET', '/health');
-    render('health', 'GET', '/health', r);
-  }
-
-  async function callWithoutKey() {
-    highlight(['auth']);
-    const r = await call('POST', '/gift-cards/process', {
-      body: { referidoId: 'X', contactId: 'X', contactEmail: 'x@example.com' },
-      useKey: false,
-    });
-    render('auth', 'POST', '/gift-cards/process', r, { headers: 'sin x-api-key' });
-    // Un 401 es el resultado esperado de esta prueba
-    if (r.status === 401) show('st-auth', 'ok', '401 esperado ✓');
-  }
-
-  async function callProcess() {
-    const body = {
-      referidoId: document.getElementById('f-referido').value,
+  function processBody() {
+    return {
+      rewardId: document.getElementById('f-reward').value,
       contactId: 'CONTACT-DEMO-001',
       contactEmail: document.getElementById('f-email').value,
       contactName: document.getElementById('f-name').value,
       amount: parseInt(document.getElementById('f-amount').value, 10),
       currencyCode: 'EUR',
     };
-    const r = await call('POST', '/gift-cards/process', { body, useKey: true });
-    if (r.data && r.data.status === 'resent') {
-      highlight(['auth', 'idem', 'mail', 'audit']);
-    } else {
-      highlight(['auth', 'idem', 'amazon', 'crypt', 'db', 'mail', 'audit']);
-    }
-    render('process', 'POST', '/gift-cards/process', r, { headers: 'x-api-key: ••••••' });
   }
 
-  async function callLastEmail() {
-    const r = await call('GET', '/gift-cards/demo/last-email', { useKey: true });
-    const out = document.getElementById('out-email');
-    const preview = document.getElementById('emailPreview');
+  async function call(method, url, { body, useKey = true } = {}) {
+    const headers = {};
+    if (body) headers['Content-Type'] = 'application/json';
+    if (useKey && API_KEY) headers['x-api-key'] = API_KEY;
+    const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    let data;
+    try { data = await res.json(); } catch { data = null; }
+    return { status: res.status, data, sentHeaders: headers, method, url, body };
+  }
+
+  function openModal({ title, explain, result, expectError = false, extraHTML = '' }) {
+    document.getElementById('m-title').textContent = title;
+    document.getElementById('m-explain').textContent = explain;
+
+    const headerLines = Object.entries(result.sentHeaders)
+      .map(([k, v]) => k + ': ' + (k === 'x-api-key' ? v.slice(0, 4) + '••••••' : v));
+    document.getElementById('m-request').textContent =
+      result.method + ' ' + result.url +
+      (headerLines.length ? '\n' + headerLines.join('\n') : '\n(no headers)') +
+      (result.body ? '\n\n' + JSON.stringify(result.body, null, 2) : '');
+
+    const ok = expectError ? (result.status >= 400) : (result.status >= 200 && result.status < 300);
+    const chip = document.getElementById('m-status');
+    chip.className = 'status-chip ' + (ok ? 'ok' : 'err');
+    chip.textContent = 'HTTP ' + result.status + (expectError && ok ? ' — expected ✓' : '');
+
+    document.getElementById('m-response').textContent = JSON.stringify(result.data, null, 2);
+    document.getElementById('m-extra').innerHTML = extraHTML;
+    document.getElementById('overlay').classList.add('open');
+    return ok;
+  }
+
+  function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  function markDone(id, ok) { if (ok) document.getElementById(id).classList.add('done'); }
+
+  async function step1() {
+    const r = await call('POST', '/gift-cards/process', { body: processBody(), useKey: false });
+    const ok = openModal({
+      title: 'Step 1 · Authentication',
+      explain: 'This request was sent WITHOUT the x-api-key header. The API rejects it before touching any business logic — a 401 here is the correct behaviour.',
+      result: r,
+      expectError: true,
+    });
+    markDone('s1', ok);
+  }
+
+  async function step2() {
+    const r = await call('POST', '/gift-cards/process', { body: processBody() });
+    if (r.data && r.data.giftCardId) state.giftCardId = r.data.giftCardId;
+    const generated = r.data && r.data.status === 'generated';
+    const ok = openModal({
+      title: 'Step 2 · Generate & send',
+      explain: generated
+        ? 'The full pipeline ran: customer validated against the CRM, funds checked, code generated, encrypted with AES-256-GCM, stored as ciphertext, emailed, and audited. Note the response never contains the code.'
+        : 'This rewardId already had a card, so the API resent the existing one instead of generating a new code. Press "New rewardId" above to start fresh.',
+      result: r,
+    });
+    markDone('s2', ok);
+  }
+
+  async function step3() {
+    if (!state.giftCardId) {
+      await step2();
+      return;
+    }
+    const r = await call('POST', '/gift-cards/process', { body: processBody() });
+    const ok = openModal({
+      title: 'Step 3 · Idempotency',
+      explain: 'Exact same call, same rewardId. Instead of generating (and paying for) a second card, the API detected the existing one and resent it — see "status": "resent" and the same giftCardId as before.',
+      result: r,
+    });
+    markDone('s3', ok);
+  }
+
+  async function step4() {
+    const r = await call('GET', '/gift-cards/demo/records');
+    const ok = openModal({
+      title: 'Step 4 · Encrypted storage',
+      explain: 'These are the raw database rows. Look at amazon_code_encrypted: AES-256-GCM ciphertext in base64. The plaintext code exists nowhere in storage — not even the developer can read it.',
+      result: r,
+    });
+    markDone('s4', ok);
+  }
+
+  async function step5() {
+    const r = await call('GET', '/gift-cards/demo/last-email');
+    let extra = '';
     if (r.status === 200 && r.data && r.data.email) {
       const e = r.data.email;
-      document.getElementById('emailHead').innerHTML =
-        '<strong>De:</strong> ' + e.from + ' · <strong>Para:</strong> ' + e.to + '<br><strong>Asunto:</strong> ' + e.subject;
-      document.getElementById('emailGreeting').textContent = e.body.greeting;
-      document.getElementById('emailMsg').textContent = e.body.message;
-      document.getElementById('emailCode').textContent = e.body.giftCardCode;
-      document.getElementById('emailAmount').textContent = e.body.amount + ' ' + e.body.currency;
-      preview.classList.add('visible');
-      out.classList.remove('visible');
-      show('st-email', 'ok', 'simulado ✓');
-    } else {
-      preview.classList.remove('visible');
-      out.textContent = 'HTTP ' + r.status + '\n' + JSON.stringify(r.data, null, 2) +
-        (r.status === 200 ? '\n\n(Aún no hay emails: genera primero una tarjeta 🎁)' : '');
-      out.classList.add('visible');
-      show('st-email', r.status === 200 ? 'ok' : 'err', 'HTTP ' + r.status);
+      extra =
+        '<div class="lbl" style="margin-bottom:0.3rem">Rendered preview (simulated)</div>' +
+        '<div class="email-preview"><div class="mail-head"><strong>From:</strong> ' + e.from +
+        ' · <strong>To:</strong> ' + e.to + '<br><strong>Subject:</strong> ' + e.subject +
+        '</div><div class="mail-body"><div>' + e.body.greeting + '</div>' +
+        '<div style="color: var(--muted); font-size: 0.9rem;">' + e.body.message + '</div>' +
+        '<div class="code-chip">' + e.body.giftCardCode + '</div>' +
+        '<div style="font-weight:700;">' + e.body.amount + ' ' + e.body.currency + '</div></div></div>';
     }
+    const ok = openModal({
+      title: 'Step 5 · The email',
+      explain: r.data && r.data.email
+        ? 'This is the only place the code ever appears in plaintext: the email to the customer. It was decrypted in memory, passed to the mailer, and the variable was nulled right after.'
+        : 'No email yet — run step 2 first to generate a card.',
+      result: r,
+      extraHTML: extra,
+    });
+    markDone('s5', ok && !!(r.data && r.data.email));
   }
 
-  async function callRecords() {
-    const r = await call('GET', '/gift-cards/demo/records', { useKey: true });
-    highlight(['db']);
-    render('records', 'GET', '/gift-cards/demo/records', r, { headers: 'x-api-key: ••••••' });
+  async function step6() {
+    if (!state.giftCardId) {
+      await step2();
+      return;
+    }
+    const r = await call('POST', '/gift-cards/resend', {
+      body: { giftCardId: state.giftCardId, contactEmail: document.getElementById('f-email').value },
+    });
+    const ok = openModal({
+      title: 'Step 6 · Manual resend',
+      explain: 'A CRM agent can resend a card by giftCardId (customer lost the email, etc.). Resends are capped — 1/hour, 3/day, 5 total in production — so a stolen API key can\'t be used to spam codes. Watch resendCount grow; after 5 the API answers 429.',
+      result: r,
+      expectError: r.status === 429,
+    });
+    markDone('s6', ok);
   }
 
-  async function callAudit() {
-    const r = await call('GET', '/gift-cards/demo/audit', { useKey: true });
-    highlight(['audit']);
-    render('audit', 'GET', '/gift-cards/demo/audit', r, { headers: 'x-api-key: ••••••' });
+  async function step7() {
+    const r = await call('GET', '/gift-cards/demo/audit');
+    const ok = openModal({
+      title: 'Step 7 · Audit trail',
+      explain: 'Every action you just performed left a record: action, gift card, actor, source IP, timestamp. In production this lives in BigQuery + Cloud Logging where the auditor role is read-only — the developer cannot rewrite history.',
+      result: r,
+    });
+    markDone('s7', ok);
   }
 </script>
 </body>

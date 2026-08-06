@@ -103,10 +103,10 @@ class SendGridService {
           simulated: true,
           to: recipientEmail,
           from: this.fromEmail,
-          subject: `🎁 ¡Has recibido una tarjeta regalo de ${(amount || 5000) / 100} ${currency}!`,
+          subject: `🎁 You've received a ${(amount || 5000) / 100} ${currency} gift card!`,
           body: {
-            greeting: `Hola ${recipientName || 'Amigo'},`,
-            message: 'Gracias por tu referido. Aquí tienes tu tarjeta regalo de Amazon:',
+            greeting: `Hi ${recipientName || 'there'},`,
+            message: 'You have earned a reward. Here is your Amazon gift card:',
             giftCardCode: plainCode,
             amount: (amount || 5000) / 100,
             currency,

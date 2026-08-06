@@ -94,7 +94,7 @@ async function createGiftCardsTable(dataset) {
 
   const schema = [
     { name: 'id', type: 'STRING', mode: 'REQUIRED', description: 'UUID único' },
-    { name: 'referido_id', type: 'STRING', mode: 'REQUIRED', description: 'ID Referidos (UNIQUE)' },
+    { name: 'reward_id', type: 'STRING', mode: 'REQUIRED', description: 'ID Referidos (UNIQUE)' },
     { name: 'contact_email', type: 'STRING', mode: 'REQUIRED', description: 'Email del alumno' },
     { name: 'amazon_code_encrypted', type: 'STRING', mode: 'REQUIRED', description: 'Código AES-256' },
     { name: 'amazon_creation_request_id', type: 'STRING', mode: 'REQUIRED', description: 'UUID idempotencia (UNIQUE)' },

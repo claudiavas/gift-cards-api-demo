@@ -87,7 +87,7 @@ const processRateLimiter = createRateLimiter(
 
 /**
  * Rate limiter para POST /gift-cards/resend
- * Máximo 50 reenvíos por hora (por referido, máx 5 totales)
+ * Máximo 50 reenvíos por hora (por tarjeta, máx 5 totales)
  */
 const resendRateLimiter = createRateLimiter(
   50, // maxRequests

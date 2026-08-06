@@ -1,6 +1,6 @@
 # 🎁 Gift Cards API
 
-API REST que automatiza un programa de recompensas por referidos: genera tarjetas regalo de Amazon, las encripta, las entrega por email y deja una pista de auditoría inmutable.
+API REST que automatiza la entrega de recompensas (referidos, promociones, fidelización...): genera tarjetas regalo de Amazon, las encripta, las entrega por email y deja una pista de auditoría inmutable.
 
 **🚀 Demo interactiva en vivo:** <https://gift-cards-api-production.up.railway.app>
 
@@ -8,20 +8,20 @@ API REST que automatiza un programa de recompensas por referidos: genera tarjeta
 
 ## El problema
 
-Una empresa recompensa a sus clientes con tarjetas regalo de Amazon cuando refieren a un nuevo cliente. Hacerlo a mano no escala y tiene un riesgo serio: **un código de tarjeta regalo es dinero al portador**. Cualquiera que lo vea —en la base de datos, en un log, en un email interno— puede canjearlo.
+Una empresa recompensa a sus clientes con tarjetas regalo de Amazon (por un referido, una promoción, un programa de fidelización...). Hacerlo a mano no escala y tiene un riesgo serio: **un código de tarjeta regalo es dinero al portador**. Cualquiera que lo vea —en la base de datos, en un log, en un email interno— puede canjearlo.
 
-Esta API resuelve ambas cosas: automatiza el flujo completo (CRM → Amazon → email) y garantiza que **el código nunca existe en plaintext** fuera de la memoria del proceso.
+Esta API resuelve ambas cosas: automatiza el flujo completo (CRM → Amazon → email) y garantiza que **el código nunca existe en plaintext** fuera de la memoria del proceso. Antes de generar nada, valida contra el CRM de origen (cualquiera con API HTTP: Zoho, HubSpot, Salesforce, un backoffice propio) que el contacto es un cliente elegible; cada recompensa llega identificada por un `rewardId` único que actúa como clave de idempotencia.
 
 ## Arquitectura
 
 ```text
-Zoho CRM (scheduler diario)
+Cualquier CRM / backoffice (scheduler diario o botón manual)
       │  POST /gift-cards/process
       ▼
 ┌─────────────────────────────────────────────┐
 │  API Node.js + Express                      │
 │  ├─ Auth por API key + rate limiting       │
-│  ├─ Idempotencia por referido              │
+│  ├─ Idempotencia por rewardId              │
 │  ├─ Amazon Incentives API (AWS SigV4)      │
 │  ├─ Encriptación AES-256-GCM inmediata     │
 │  ├─ BigQuery (solo códigos encriptados)    │
@@ -42,7 +42,7 @@ Zoho CRM (scheduler diario)
 
 1. **Encriptación inmediata** — el código se encripta en el instante en que Amazon lo devuelve; solo se desencripta en memoria justo antes de componer el email, y la variable se anula después.
 2. **Sanitización de logs** — un middleware redacta códigos de tarjeta, claves AWS, tokens y emails de todo lo que va a los logs (patrones regex, testeado).
-3. **Idempotencia** — un `creationRequestId` único y un constraint por referido garantizan que un reintento del scheduler nunca genere (ni pague) dos tarjetas.
+3. **Idempotencia** — un `creationRequestId` único y un constraint por `rewardId` garantizan que un reintento del scheduler nunca genere (ni pague) dos tarjetas.
 4. **Auditoría independiente** — el log de accesos es inmutable; la empresa audita qué pasó con cada código sin depender del desarrollador.
 5. **Rate limiting** — límites por API key/IP y reglas de reenvío: máximo 1/hora, 3/día, 5 en total por tarjeta.
 6. **Manejo de errores de Amazon** — F300 (fondos), F400 (temporal), etc. se traducen a estrategias distintas: backoff exponencial, alerta al CRM o fallo controlado.
@@ -92,7 +92,7 @@ src/
 │   ├── amazon.js         # Amazon Incentives API (AWS SigV4, reintentos)
 │   ├── bigquery.js       # Persistencia + auditoría (in-memory en demo)
 │   ├── sendgrid.js       # Email (simulado en demo)
-│   └── zoho.js           # Validaciones contra el CRM
+│   └── crm.js            # Integración genérica con el CRM de origen
 └── utils/
     ├── encryption.js     # AES-256-GCM
     └── logger.js         # Logging estructurado + sanitizado

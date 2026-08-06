@@ -70,7 +70,7 @@ class BigQueryService {
       // Tabla: gift_cards
       const giftCardsSchema = [
         { name: 'id', type: 'STRING', mode: 'REQUIRED', description: 'UUID único' },
-        { name: 'referido_id', type: 'STRING', mode: 'REQUIRED', description: 'ID del módulo Referidos en Zoho (ÚNICO)' },
+        { name: 'reward_id', type: 'STRING', mode: 'REQUIRED', description: 'ID externo de la recompensa en el CRM de origen (ÚNICO)' },
         { name: 'contact_email', type: 'STRING', mode: 'REQUIRED', description: 'Email del destinatario (inmutable)' },
         { name: 'amazon_code_encrypted', type: 'STRING', mode: 'REQUIRED', description: 'Código AES-256 encriptado en base64' },
         { name: 'amazon_creation_request_id', type: 'STRING', mode: 'REQUIRED', description: 'UUID para idempotencia (ÚNICO)' },
@@ -137,7 +137,7 @@ class BigQueryService {
   /**
    * Guardar un código encriptado en gift_cards
    *
-   * @param {object} giftCard - { id, referidoId, contactEmail, codeEncrypted, creationRequestId, ... }
+   * @param {object} giftCard - { id, rewardId, contactEmail, codeEncrypted, creationRequestId, ... }
    * @returns {Promise<object>} Registro guardado
    */
   async saveGiftCard(giftCard) {
@@ -148,7 +148,7 @@ class BigQueryService {
       }
 
       // Validación de campos requeridos
-      const required = ['referido_id', 'contact_email', 'amazon_code_encrypted', 'amazon_creation_request_id'];
+      const required = ['reward_id', 'contact_email', 'amazon_code_encrypted', 'amazon_creation_request_id'];
       for (const field of required) {
         if (!giftCard[field]) {
           throw new Error(`Missing required field: ${field}`);
@@ -157,7 +157,7 @@ class BigQueryService {
 
       const row = {
         id: giftCard.id || require('uuid').v4(),
-        referido_id: giftCard.referido_id,
+        reward_id: giftCard.reward_id,
         contact_email: giftCard.contact_email,
         amazon_code_encrypted: giftCard.amazon_code_encrypted, // ENCRIPTADO
         amazon_creation_request_id: giftCard.amazon_creation_request_id,
@@ -170,8 +170,8 @@ class BigQueryService {
       };
 
       if (this.demoMode) {
-        if (this.demoGiftCards.some(c => c.referido_id === row.referido_id)) {
-          throw new Error('UNIQUE constraint: gift card already exists for this referido');
+        if (this.demoGiftCards.some(c => c.reward_id === row.reward_id)) {
+          throw new Error('UNIQUE constraint: gift card already exists for this rewardId');
         }
         this.demoGiftCards.push(row);
       } else {
@@ -179,19 +179,19 @@ class BigQueryService {
       }
 
       logger.audit('gift_card_saved', row.id, {
-        referido_id: giftCard.referido_id,
+        reward_id: giftCard.reward_id,
         creationRequestId: giftCard.amazon_creation_request_id,
       });
 
       return row;
     } catch (error) {
       logger.error('Error saving gift card', error, {
-        referidoId: giftCard?.referido_id,
+        rewardId: giftCard?.reward_id,
       });
 
       // Si es error de UNIQUE constraint, el registro ya existe
       if (error.message?.includes('UNIQUE')) {
-        throw new Error('Gift card already exists for this referido');
+        throw new Error('Gift card already exists for this rewardId');
       }
 
       throw error;
@@ -199,25 +199,25 @@ class BigQueryService {
   }
 
   /**
-   * Buscar gift card por referidoId
-   * @param {string} referidoId - ID del referido
+   * Buscar gift card por rewardId
+   * @param {string} rewardId - ID externo de la recompensa (idempotencia)
    * @returns {Promise<object|null>}
    */
-  async findGiftCardByReferidoId(referidoId) {
+  async findGiftCardByRewardId(rewardId) {
     try {
       if (this.demoMode) {
-        return this.demoGiftCards.find(c => c.referido_id === referidoId) || null;
+        return this.demoGiftCards.find(c => c.reward_id === rewardId) || null;
       }
 
       const query = `
         SELECT * FROM \`${process.env.GOOGLE_PROJECT_ID}.${process.env.GOOGLE_DATASET_ID}.gift_cards\`
-        WHERE referido_id = @referidoId
+        WHERE reward_id = @rewardId
         LIMIT 1
       `;
 
       const options = {
         query,
-        params: { referidoId },
+        params: { rewardId },
       };
 
       const [rows] = await this.bigquery.query(options);

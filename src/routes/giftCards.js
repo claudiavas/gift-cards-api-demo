@@ -98,7 +98,7 @@ async function resendExistingGiftCard(giftCard, { contactEmail, contactName, sou
  *
  * Flujo:
  * 1. Validar datos de entrada
- * 2. Buscar si ya existe gift card para este referido (idempotencia)
+ * 2. Buscar si ya existe gift card para este rewardId (idempotencia)
  *    - SI existe: reenviar código existente
  *    - NO existe: generar nuevo código
  * 3. Verificar fondos disponibles en Amazon
@@ -110,28 +110,28 @@ async function resendExistingGiftCard(giftCard, { contactEmail, contactName, sou
  */
 router.post('/process', processRateLimiter, async (req, res) => {
   const requestId = uuidv4();
-  const { referidoId, contactId, contactEmail, contactName, amount = 5000, currencyCode = 'USD' } = req.body;
+  const { rewardId, contactId, contactEmail, contactName, amount = 5000, currencyCode = 'USD' } = req.body;
 
   try {
     // ============================================================================
     // VALIDACIÓN DE ENTRADA
     // ============================================================================
-    if (!referidoId || !contactId || !contactEmail) {
+    if (!rewardId || !contactId || !contactEmail) {
       logger.warn('Missing required fields', {
         requestId,
-        has_referidoId: !!referidoId,
+        has_rewardId: !!rewardId,
         has_contactId: !!contactId,
         has_contactEmail: !!contactEmail,
       });
 
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: referidoId, contactId, contactEmail',
+        error: 'Missing required fields: rewardId, contactId, contactEmail',
       });
     }
 
     logger.audit('process_started', requestId, {
-      referidoId,
+      rewardId,
       contactId,
       contactEmail,
       amount,
@@ -139,13 +139,13 @@ router.post('/process', processRateLimiter, async (req, res) => {
     });
 
     // ============================================================================
-    // PASO 1: Buscar si ya existe gift card para este referido (IDEMPOTENCIA)
+    // PASO 1: Buscar si ya existe gift card para este rewardId (IDEMPOTENCIA)
     // ============================================================================
-    const existingGiftCard = await bigqueryService.findGiftCardByReferidoId(referidoId);
+    const existingGiftCard = await bigqueryService.findGiftCardByRewardId(rewardId);
 
     if (existingGiftCard) {
       logger.info('Gift card already exists, reusing existing code', {
-        referidoId,
+        rewardId,
         giftCardId: existingGiftCard.id,
       });
 
@@ -170,20 +170,21 @@ router.post('/process', processRateLimiter, async (req, res) => {
     }
 
     // ============================================================================
-    // PASO 2: Validaciones previas (contacto matriculado, 20+ días)
+    // PASO 2: Validar contra el CRM que el contacto es un cliente
     // ============================================================================
-    // En producción esta validación consulta el CRM. En demo siempre pasa.
+    // En producción esta validación consulta el CRM de origen (ver services/crm.js).
+    // En demo siempre pasa.
     const validationPassed = true;
     if (!validationPassed) {
       await bigqueryService.logAction('validation_failed', requestId, {
-        failure_reason: 'Contact does not meet requirements',
+        failure_reason: 'Contact is not an eligible customer',
         source_ip: req.ip,
       });
 
       return res.status(400).json({
         success: false,
-        error: 'Contact does not meet requirements',
-        detail: 'Contact must have matriculated invoice > 20 days ago',
+        error: 'Contact is not an eligible customer',
+        detail: 'The CRM lookup did not confirm this contact as a customer',
       });
     }
 
@@ -192,7 +193,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     // ============================================================================
     const hasFunds = await amazonService.hasAvailableFunds(amount);
     if (!hasFunds) {
-      logger.error('Insufficient funds in Amazon', null, { amount, referidoId });
+      logger.error('Insufficient funds in Amazon', null, { amount, rewardId });
 
       await bigqueryService.logAction('amazon_error', requestId, {
         failure_reason: 'Insufficient funds',
@@ -210,7 +211,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     // ============================================================================
     // PASO 4: Generar código en Amazon
     // ============================================================================
-    logger.info('Creating gift card in Amazon', { amount, currencyCode, referidoId });
+    logger.info('Creating gift card in Amazon', { amount, currencyCode, rewardId });
 
     let amazonResult;
     try {
@@ -219,10 +220,10 @@ router.post('/process', processRateLimiter, async (req, res) => {
       logger.audit('amazon_code_generated', requestId, {
         amount,
         currency: currencyCode,
-        referidoId,
+        rewardId,
       });
     } catch (error) {
-      logger.error('Amazon API error', error, { referidoId, errorCode: error.code });
+      logger.error('Amazon API error', error, { rewardId, errorCode: error.code });
 
       await bigqueryService.logAction('amazon_error', requestId, {
         failure_reason: error.message,
@@ -266,7 +267,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     try {
       const savedCard = await bigqueryService.saveGiftCard({
         id: requestId,
-        referido_id: referidoId,
+        reward_id: rewardId,
         contact_email: contactEmail,
         amazon_code_encrypted: codeEncrypted,
         amazon_creation_request_id: amazonResult.creationRequestId,
@@ -276,7 +277,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
 
       giftCardId = savedCard.id;
       logger.audit('gift_card_saved', giftCardId, {
-        referidoId,
+        rewardId,
         creationRequestId: amazonResult.creationRequestId,
       });
 
@@ -285,7 +286,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
         source_ip: req.ip,
       });
     } catch (error) {
-      logger.error('Error saving to BigQuery', error, { referidoId });
+      logger.error('Error saving to BigQuery', error, { rewardId });
       return res.status(500).json({ success: false, error: 'Database error' });
     }
 
@@ -330,7 +331,7 @@ router.post('/process', processRateLimiter, async (req, res) => {
     // PASO 8: Respuesta exitosa
     // ============================================================================
     logger.audit('process_completed', giftCardId, {
-      referidoId,
+      rewardId,
       status: 'generated',
     });
 

@@ -4,7 +4,7 @@
 # Script para configurar Cloud Scheduler
 #
 # Crea un job diario que llama al endpoint POST /gift-cards/process
-# Busca referidos con 20+ días sin tarjeta regalo
+# Busca recompensas con 20+ días sin tarjeta regalo
 #
 # Uso: bash scripts/cloud-scheduler-setup.sh
 # ============================================================================
@@ -53,11 +53,11 @@ echo "2️⃣  Creando Cloud Scheduler job..."
 
 # Payload para el POST
 PAYLOAD='[
-  {"referidoId": "{{referidoId}}", "contactId": "{{contactId}}"},
-  {"referidoId": "{{referidoId2}}", "contactId": "{{contactId2}}"}
+  {"rewardId": "{{rewardId}}", "contactId": "{{contactId}}"},
+  {"rewardId": "{{rewardId2}}", "contactId": "{{contactId2}}"}
 ]'
 
-# Crear job (reemplazar cada día con nuevos referidos)
+# Crear job (reemplazar cada día con nuevos recompensas)
 gcloud scheduler jobs create http "gift-cards-daily" \
   --schedule="0 3 * * *" \  # 3 AM UTC cada día
   --time-zone="UTC" \
@@ -66,7 +66,7 @@ gcloud scheduler jobs create http "gift-cards-daily" \
   --oidc-service-account-email="$SERVICE_ACCOUNT" \
   --oidc-token-audience="${API_ENDPOINT}" \
   --headers="x-api-key=${API_KEY},Content-Type=application/json" \
-  --message-body='{"referidoId":"AUTO_FETCH","mode":"scheduled"}' \
+  --message-body='{"rewardId":"AUTO_FETCH","mode":"scheduled"}' \
   --project="$PROJECT_ID" \
   --location="$REGION" \
   --no-attempt-deadline || \
@@ -78,7 +78,7 @@ gcloud scheduler jobs update http "gift-cards-daily" \
   --oidc-service-account-email="$SERVICE_ACCOUNT" \
   --oidc-token-audience="${API_ENDPOINT}" \
   --headers="x-api-key=${API_KEY},Content-Type=application/json" \
-  --message-body='{"referidoId":"AUTO_FETCH","mode":"scheduled"}' \
+  --message-body='{"rewardId":"AUTO_FETCH","mode":"scheduled"}' \
   --project="$PROJECT_ID" \
   --location="$REGION" \
   --no-attempt-deadline
@@ -108,5 +108,5 @@ echo "2. Verificar job: gcloud scheduler jobs describe gift-cards-daily --locati
 echo "3. Ejecutar manualmente: gcloud scheduler jobs run gift-cards-daily --location=$REGION"
 echo "4. Ver logs: gcloud logging read --limit 50 | grep gift-cards"
 echo ""
-echo "Nota: El scheduler busca referidos automáticamente en cada ejecución"
+echo "Nota: El scheduler busca recompensas automáticamente en cada ejecución"
 echo "Se ejecuta diariamente a las 3 AM UTC"
