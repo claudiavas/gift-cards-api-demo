@@ -1,0 +1,48 @@
+# Google Cloud deployment ignore file
+# Similar a .gitignore pero específico para `gcloud app deploy`
+
+# ============================================================================
+# NO deployer estos archivos a Google Cloud
+# ============================================================================
+
+# Archivos locales
+.env
+.env.local
+.DS_Store
+.vscode/
+.idea/
+
+# Node modules
+node_modules/
+
+# Tests
+tests/
+*.test.js
+coverage/
+.nyc_output/
+
+# Development
+Dockerfile.dev
+docker-compose.yml
+scripts/
+
+# Git
+.git/
+.gitignore
+
+# Docs (opcionales)
+docs/
+
+# Logs
+*.log
+logs/
+
+# Temporales
+tmp/
+temp/
+.temp/
+
+# IDE
+*.swp
+*.swo
+*~

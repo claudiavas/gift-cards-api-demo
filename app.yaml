@@ -1,0 +1,44 @@
+# ============================================================================
+# Configuración para Google Cloud Run
+#
+# Deploy: gcloud run deploy gift-cards-api --source .
+# ============================================================================
+
+runtime: nodejs18
+
+# Variables de entorno (SENSIBLES - nunca commitear)
+# Usar Google Cloud Secret Manager en producción
+env_variables:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  DEBUG: "false"
+
+# Instancias
+env:
+  flex
+
+# Recursos
+resources:
+  cpu: 1
+  memory_gb: 1
+  disk_size_gb: 10
+
+# Auto-scaling
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+
+# Healthcheck
+health_check:
+  enable_health_checks: true
+  initial_delay_sec: 40
+  timeout_sec: 4
+  unhealthy_threshold: 3
+  healthy_threshold: 2
+  check_interval_sec: 30
+
+# Permisos IAM
+handlers:
+  - url: /.*
+    script: auto
+    secure: always  # HTTPS obligatorio

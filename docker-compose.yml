@@ -1,0 +1,70 @@
+# ============================================================================
+# Docker Compose para desarrollo local
+#
+# Uso: docker-compose up
+# Acceder: http://localhost:3000/health
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # Servidor Express - Gift Cards API
+  app:
+    build: .
+    container_name: gift-cards-api-dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DEBUG: 'true'
+      API_PORT: 3000
+      # IMPORTANTE: Copiar valores de .env
+      GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
+      GOOGLE_DATASET_ID: ${GOOGLE_DATASET_ID}
+      AMAZON_PARTNER_ID: ${AMAZON_PARTNER_ID}
+      AMAZON_ACCESS_KEY: ${AMAZON_ACCESS_KEY}
+      AMAZON_SECRET_KEY: ${AMAZON_SECRET_KEY}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      API_KEY: ${API_KEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    volumes:
+      # Montar código local para cambios en vivo
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    networks:
+      - gift-cards-network
+
+  # PostgreSQL para rate limiting en desarrollo (opcional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: gift-cards-postgres
+    environment:
+      POSTGRES_USER: giftcards
+      POSTGRES_PASSWORD: dev-password
+      POSTGRES_DB: giftcards_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U giftcards"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gift-cards-network
+
+networks:
+  gift-cards-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
