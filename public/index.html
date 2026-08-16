@@ -119,6 +119,7 @@
     background: radial-gradient(circle at 50% 0%, var(--accent-soft) 0%, transparent 60%);
   }
   header p.tagline { color: var(--text); margin: 0 auto; font-size: 1.2rem; max-width: 680px; line-height: 1.7; }
+  header p.tagline + p.tagline { margin-top: 1rem; }
   .badges { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 2.25rem; }
   .badge {
     font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 99px;
@@ -279,9 +280,11 @@
 
 <header class="wrap">
   <p class="tagline" data-i18n-html="hdr.tagline">
-    A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them with
-    AES-256-GCM, delivers them by email and keeps an immutable audit trail. Any CRM or backoffice
-    can trigger it — rewards for referrals, promotions, loyalty programs or anything else.
+    A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them,
+    delivers them by email and keeps an immutable audit trail.
+  </p>
+  <p class="tagline" data-i18n-html="hdr.tagline2">
+    Any CRM or backoffice can trigger it — rewards for referrals, promotions, loyalty programs or anything else.
   </p>
   <div class="badges">
     <span class="badge">Node.js + Express</span>
@@ -526,7 +529,8 @@
 <script>
   const TRANSLATIONS = {
     en: {
-      'hdr.tagline': 'A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them with AES-256-GCM, delivers them by email and keeps an immutable audit trail. Any CRM or backoffice can trigger it — rewards for referrals, promotions, loyalty programs or anything else.',
+      'hdr.tagline': 'A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them, delivers them by email and keeps an immutable audit trail.',
+      'hdr.tagline2': 'Any CRM or backoffice can trigger it — rewards for referrals, promotions, loyalty programs or anything else.',
       'nav.how': 'How it works', 'nav.try': 'Try it', 'nav.security': 'Security decisions',
       'how.title': 'How it works',
       'how.sub': 'A CRM detects that a customer earned a reward and calls the API with a unique <code>rewardId</code>. The API validates the contact against the CRM, generates the gift card, encrypts the code before it touches any storage, emails it to the recipient, and records every action in an audit log the developer cannot alter.',
@@ -588,7 +592,8 @@
       'm.s7.explain': 'Every action you just performed left a record: action, gift card, actor, source IP, timestamp. The audit table is append-only: the application role can only INSERT and the auditor role can only SELECT — the developer cannot rewrite history.',
     },
     es: {
-      'hdr.tagline': 'Una API REST que automatiza la entrega de recompensas: genera tarjetas regalo de Amazon, las cifra con AES-256-GCM, las envía por email y mantiene un registro de auditoría inmutable. Cualquier CRM o backoffice puede activarla — recompensas por referidos, promociones, programas de fidelización o cualquier otro caso.',
+      'hdr.tagline': 'Una API REST que automatiza la entrega de recompensas: genera tarjetas regalo de Amazon, las cifra, las envía por email y mantiene un registro de auditoría inmutable.',
+      'hdr.tagline2': 'Cualquier CRM o backoffice puede activarla — recompensas por referidos, promociones, programas de fidelización o cualquier otro caso.',
       'nav.how': 'Cómo funciona', 'nav.try': 'Pruébalo', 'nav.security': 'Decisiones de seguridad',
       'how.title': 'Cómo funciona',
       'how.sub': 'Un CRM detecta que un cliente ganó una recompensa y llama a la API con un <code>rewardId</code> único. La API valida el contacto contra el CRM, genera la tarjeta regalo, cifra el código antes de que toque cualquier almacenamiento, la envía por email al destinatario, y registra cada acción en un log de auditoría que el desarrollador no puede alterar.',
