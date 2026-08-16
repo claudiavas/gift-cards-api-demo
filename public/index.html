@@ -64,11 +64,14 @@
   }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 0 1rem; }
 
-  body { padding-top: 2.75rem; padding-bottom: 2.75rem; }
+  body { padding-top: 2.75rem; }
 
   .topbar, .bottombar {
     position: fixed; left: 0; right: 0; z-index: 60;
-    background: var(--bg); border-color: var(--border);
+    background: #e6e6e6; border-color: var(--border);
+  }
+  @media (prefers-color-scheme: dark) {
+    .topbar, .bottombar { background: #3c3c3c; }
   }
   .topbar { top: 0; border-bottom: 1px solid var(--border); }
   .bottombar { bottom: 0; border-top: 1px solid var(--border); }
@@ -79,10 +82,24 @@
   .topbar .brand { display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.9rem; }
   .topbar .brand svg { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; }
   .topbar .brand span { color: var(--accent); }
-  #langSelect {
-    width: auto; padding: 0.3rem 0.5rem; font-size: 0.8rem; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer;
+  .topbar-nav { display: flex; align-items: center; gap: 1.25rem; }
+  .topbar-nav a {
+    color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+    transition: color 0.2s;
   }
+  .topbar-nav a:hover { color: var(--accent); }
+  @media (max-width: 720px) {
+    .topbar-nav { display: none; }
+  }
+  .lang-toggle { display: flex; align-items: center; gap: 0.4rem; }
+  .lang-circle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 50%; font-size: 0.72rem; font-weight: 700;
+    color: var(--text); border: 1px solid var(--border); background: transparent;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .lang-circle:hover { border-color: var(--accent); color: var(--accent); }
+  .lang-circle.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
   .bottombar .wrap { justify-content: center; gap: 1rem; }
   .icon-link {
     display: inline-flex; align-items: center; justify-content: center;
@@ -91,14 +108,11 @@
   }
   .icon-link:hover { border-color: var(--accent); color: var(--accent); }
   .icon-link svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-link.github svg { fill: currentColor; stroke: none; width: 1.1rem; height: 1.1rem; }
 
-  header { padding: 1rem 0; text-align: center; background:
+  header { padding: 3.25rem 0 2.25rem; text-align: center; background:
     radial-gradient(circle at 50% 0%, var(--accent-soft) 0%, transparent 60%); }
-  header .title-row { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
-  header .gift-icon { width: 3.17rem; height: 3.17rem; flex: 0 0 auto; display: block; }
-  header h1 { font-size: 2.4rem; letter-spacing: -0.02em; margin: 0; }
-  header h1 span { color: var(--accent); }
-  header p.tagline { color: var(--text); margin: 0.75rem auto 0; font-size: 1.05rem; max-width: 640px; }
+  header p.tagline { color: var(--text); margin: 0 auto; font-size: 1.05rem; max-width: 640px; }
   .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
   .badge {
     font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 99px;
@@ -214,7 +228,10 @@
   .sec-icon { width: 1.1rem; height: 1.1rem; flex: 0 0 auto; stroke: #555555; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .sec-item p { font-size: 0.82rem; color: var(--text); }
 
-  footer { border-top: 1px solid var(--border); margin-top: 1.5rem; padding: 1rem 0; text-align: center; color: var(--text); font-size: 0.85rem; }
+  footer { background: #e6e6e6; border-top: 1px solid var(--border); margin-top: 1.5rem; padding: 1rem 0; text-align: center; color: var(--text); font-size: 0.85rem; }
+  @media (prefers-color-scheme: dark) {
+    footer { background: #3c3c3c; }
+  }
   footer a { color: var(--accent); text-decoration: none; }
 </style>
 </head>
@@ -237,41 +254,25 @@
       </svg>
       Gift Cards <span>API</span>
     </div>
-    <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
-      <option value="en">🇬🇧 English</option>
-      <option value="es">🇪🇸 Español</option>
-    </select>
-  </div>
-</div>
-
-<div class="bottombar">
-  <div class="wrap">
-    <a class="icon-link" href="mailto:claudia.vasquez.as@gmail.com" aria-label="Email" title="Email">
-      <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M2.5 6.5L12 13.5l9.5-7"/></svg>
-    </a>
-    <a class="icon-link" href="https://github.com/claudiavas/gift-cards-api-demo" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
-      <svg viewBox="0 0 24 24"><path d="M12 2.2a9.8 9.8 0 0 0-3.1 19.1c.5.1.7-.2.7-.5v-1.8c-2.7.6-3.3-1.3-3.3-1.3-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.2-4.5-1.1-4.5-4.9 0-1.1.4-1.9 1-2.6-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.6 0 3.8-2.3 4.6-4.5 4.9.4.3.7.9.7 1.8v2.6c0 .3.2.6.7.5A9.8 9.8 0 0 0 12 2.2z"/></svg>
-    </a>
+    <nav class="topbar-nav">
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#try" data-i18n="nav.try">Try it</a>
+      <a href="#security" data-i18n="nav.security">Security decisions</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <a class="icon-link" href="mailto:claudia.vasquez.as@gmail.com" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M2.5 6.5L12 13.5l9.5-7"/></svg>
+      </a>
+      <a class="icon-link github" href="https://github.com/claudiavas/gift-cards-api-demo" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+        <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.744.083-.729.083-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.808 1.305 3.494.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.955-.266 1.98-.398 3-.403 1.02.005 2.045.137 3.005.403 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      <button type="button" class="lang-circle active" id="langCircle" onclick="toggleLang()" aria-label="Toggle language">EN</button>
+    </div>
   </div>
 </div>
 
 <header class="wrap">
-  <div class="title-row">
-  <svg class="gift-icon" viewBox="0 0 100 100" role="img" aria-label="Gift box icon">
-    <rect x="14" y="42" width="72" height="46" rx="4" fill="#00c2cb"/>
-    <rect x="10" y="30" width="80" height="16" rx="4" fill="#db5000" opacity="0.8"/>
-    <rect x="43" y="30" width="14" height="58" fill="#db5000" opacity="0.8"/>
-    <g opacity="0.8">
-      <path d="M50,29 C 38,12 18,10 16,22 C 14,32 34,36 50,29 Z" fill="#db5000"/>
-      <path d="M50,29 C 62,12 82,10 84,22 C 86,32 66,36 50,29 Z" fill="#db5000"/>
-      <path d="M46,31 L36,37 L48,39 Z" fill="#db5000"/>
-      <path d="M54,31 L64,37 L52,39 Z" fill="#db5000"/>
-      <circle cx="50" cy="29" r="5" fill="#db5000"/>
-    </g>
-  </svg>
-  <h1>Gift Cards <span>API</span></h1>
-  </div>
-  <p class="tagline" data-i18n="hdr.tagline">
+  <p class="tagline" data-i18n-html="hdr.tagline">
     A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them with
     AES-256-GCM, delivers them by email and keeps an immutable audit trail. Any CRM or backoffice
     can trigger it — rewards for referrals, promotions, loyalty programs or anything else.
@@ -288,9 +289,9 @@
 
 <main class="wrap">
 
-  <section>
+  <section id="how">
     <h2 data-i18n="how.title">How it works</h2>
-    <p class="sub" data-i18n="how.sub">
+    <p class="sub" data-i18n-html="how.sub">
       A CRM detects that a customer earned a reward and calls the API with a unique
       <code>rewardId</code>. The API validates the contact against the CRM, generates the gift card,
       encrypts the code before it touches any storage, emails it to the recipient, and records
@@ -392,7 +393,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="try">
     <h2 data-i18n="try.title">Try it — walk the pipeline</h2>
     <p class="sub" data-i18n="try.sub">
       Press each step in order: each one opens a popup with the exact HTTP call and the server's live response.
@@ -474,7 +475,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="security">
     <h2 data-i18n="sec.title">Security decisions</h2>
     <p class="sub" data-i18n="sec.sub">The design starts from one premise: a gift card code is bearer money, so neither the database, nor the logs, nor the developer should ever see one.</p>
     <div class="sec-grid">
@@ -520,20 +521,21 @@
   const TRANSLATIONS = {
     en: {
       'hdr.tagline': 'A REST API that automates reward delivery: it generates Amazon gift cards, encrypts them with AES-256-GCM, delivers them by email and keeps an immutable audit trail. Any CRM or backoffice can trigger it — rewards for referrals, promotions, loyalty programs or anything else.',
+      'nav.how': 'How it works', 'nav.try': 'Try it', 'nav.security': 'Security decisions',
       'how.title': 'How it works',
       'how.sub': 'A CRM detects that a customer earned a reward and calls the API with a unique <code>rewardId</code>. The API validates the contact against the CRM, generates the gift card, encrypts the code before it touches any storage, emails it to the recipient, and records every action in an audit log the developer cannot alter.',
-      'dg.1': 'CRM calls POST /process', 'dg.2': 'with a unique rewardId',
-      'dg.3': 'valid API key?', 'dg.4': '401 Unauthorized',
-      'dg.5': 'already a gift card', 'dg.6': 'for this rewardId?',
-      'dg.7': 'reuse the existing code', 'dg.8': 'no double spend · max 5 resends',
-      'dg.9': 'is the contact a customer?', 'dg.10': '(lookup in the CRM)',
-      'dg.11': '400 · not eligible', 'dg.12': 'enough funds', 'dg.13': 'in the Amazon account?',
-      'dg.14': '402 · alert the CRM', 'dg.15': 'reload the account',
+      'dg.1': 'CRM calls POST /process', 'dg.2': 'With a unique rewardId',
+      'dg.3': 'Valid API key?', 'dg.4': '401 Unauthorized',
+      'dg.5': 'Already a gift card', 'dg.6': 'For this rewardId?',
+      'dg.7': 'Reuse the existing code', 'dg.8': 'No double spend · max 5 resends',
+      'dg.9': 'Is the contact a customer?', 'dg.10': '(Lookup in the CRM)',
+      'dg.11': '400 · Not eligible', 'dg.12': 'Enough funds', 'dg.13': 'In the Amazon account?',
+      'dg.14': '402 · Alert the CRM', 'dg.15': 'Reload the account',
       'dg.16': 'Amazon generates the claim code', 'dg.17': 'AWS SigV4 · retries with backoff',
       'dg.18': 'Encrypted in memory · AES-256-GCM',
-      'dg.19': 'PostgreSQL stores the ciphertext', 'dg.20': '+ append-only audit entry',
-      'dg.21': 'SendGrid emails the code', 'dg.22': 'decrypted only inside this step',
-      'dg.23': 'status update back to the CRM', 'dg.24': 'metadata only — never the code',
+      'dg.19': 'PostgreSQL stores the ciphertext', 'dg.20': '+ Append-only audit entry',
+      'dg.21': 'SendGrid emails the code', 'dg.22': 'Decrypted only inside this step',
+      'dg.23': 'Status update back to the CRM', 'dg.24': 'Metadata only — never the code',
       'dg.25': 'The customer receives the gift card',
       'dg.no': 'no', 'dg.yes': 'yes',
       'try.title': 'Try it — walk the pipeline',
@@ -581,20 +583,21 @@
     },
     es: {
       'hdr.tagline': 'Una API REST que automatiza la entrega de recompensas: genera tarjetas regalo de Amazon, las cifra con AES-256-GCM, las envía por email y mantiene un registro de auditoría inmutable. Cualquier CRM o backoffice puede activarla — recompensas por referidos, promociones, programas de fidelización o cualquier otro caso.',
+      'nav.how': 'Cómo funciona', 'nav.try': 'Pruébalo', 'nav.security': 'Decisiones de seguridad',
       'how.title': 'Cómo funciona',
       'how.sub': 'Un CRM detecta que un cliente ganó una recompensa y llama a la API con un <code>rewardId</code> único. La API valida el contacto contra el CRM, genera la tarjeta regalo, cifra el código antes de que toque cualquier almacenamiento, la envía por email al destinatario, y registra cada acción en un log de auditoría que el desarrollador no puede alterar.',
-      'dg.1': 'El CRM llama a POST /process', 'dg.2': 'con un rewardId único',
+      'dg.1': 'El CRM llama a POST /process', 'dg.2': 'Con un rewardId único',
       'dg.3': '¿API key válida?', 'dg.4': '401 No autorizado',
-      'dg.5': '¿ya existe una tarjeta', 'dg.6': 'para este rewardId?',
-      'dg.7': 'reutiliza el código existente', 'dg.8': 'sin doble gasto · máx 5 reenvíos',
-      'dg.9': '¿el contacto es cliente?', 'dg.10': '(consulta en el CRM)',
-      'dg.11': '400 · no elegible', 'dg.12': '¿hay fondos suficientes', 'dg.13': 'en la cuenta de Amazon?',
-      'dg.14': '402 · alerta al CRM', 'dg.15': 'recargar la cuenta',
+      'dg.5': '¿Ya existe una tarjeta', 'dg.6': 'Para este rewardId?',
+      'dg.7': 'Reutiliza el código existente', 'dg.8': 'Sin doble gasto · máx 5 reenvíos',
+      'dg.9': '¿El contacto es cliente?', 'dg.10': '(Consulta en el CRM)',
+      'dg.11': '400 · No elegible', 'dg.12': '¿Hay fondos suficientes', 'dg.13': 'En la cuenta de Amazon?',
+      'dg.14': '402 · Alerta al CRM', 'dg.15': 'Recargar la cuenta',
       'dg.16': 'Amazon genera el código de canje', 'dg.17': 'AWS SigV4 · reintentos con backoff',
       'dg.18': 'Cifrado en memoria · AES-256-GCM',
-      'dg.19': 'PostgreSQL guarda el texto cifrado', 'dg.20': '+ entrada de auditoría solo-adición',
-      'dg.21': 'SendGrid envía el código', 'dg.22': 'descifrado solo dentro de este paso',
-      'dg.23': 'actualización de estado al CRM', 'dg.24': 'solo metadatos — nunca el código',
+      'dg.19': 'PostgreSQL guarda el texto cifrado', 'dg.20': '+ Entrada de auditoría solo-adición',
+      'dg.21': 'SendGrid envía el código', 'dg.22': 'Descifrado solo dentro de este paso',
+      'dg.23': 'Actualización de estado al CRM', 'dg.24': 'Solo metadatos — nunca el código',
       'dg.25': 'El cliente recibe la tarjeta regalo',
       'dg.no': 'no', 'dg.yes': 'sí',
       'try.title': 'Pruébalo — recorre el pipeline',
@@ -651,7 +654,7 @@
   function setLang(lang) {
     currentLang = TRANSLATIONS[lang] ? lang : 'en';
     localStorage.setItem('lang', currentLang);
-    document.getElementById('langSelect').value = currentLang;
+    document.getElementById('langCircle').textContent = currentLang.toUpperCase();
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = t(el.getAttribute('data-i18n'));
     });
@@ -663,6 +666,10 @@
     } else {
       document.getElementById('demoBanner').textContent = t('try.notDemoBanner');
     }
+  }
+
+  function toggleLang() {
+    setLang(currentLang === 'en' ? 'es' : 'en');
   }
 
   let API_KEY = null;
