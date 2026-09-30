@@ -6,8 +6,10 @@
 <title>Gift Cards API — Live interactive demo</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='14' y='42' width='72' height='46' rx='4' fill='%2300c2cb'/%3E%3Crect x='10' y='30' width='80' height='16' rx='4' fill='%23db5000' opacity='0.8'/%3E%3Crect x='43' y='30' width='14' height='58' fill='%23db5000' opacity='0.8'/%3E%3Cg opacity='0.8'%3E%3Cpath d='M50,29 C 38,12 18,10 16,22 C 14,32 34,36 50,29 Z' fill='%23db5000'/%3E%3Cpath d='M50,29 C 62,12 82,10 84,22 C 86,32 66,36 50,29 Z' fill='%23db5000'/%3E%3Cpath d='M46,31 L36,37 L48,39 Z' fill='%23db5000'/%3E%3Cpath d='M54,31 L64,37 L52,39 Z' fill='%23db5000'/%3E%3Ccircle cx='50' cy='29' r='5' fill='%23db5000'/%3E%3C/g%3E%3C/svg%3E">
 
+<!-- Internal traffic opt-out: ?internal=1 flags this browser, ?internal=0 clears it -->
+<script>(function(w,ids){var k='internal_traffic',m=/[?&]internal=([01])(?:&|$)/.exec(w.location.search),f=!1;try{if(m){m[1]==='1'?localStorage.setItem(k,'1'):localStorage.removeItem(k)}f=localStorage.getItem(k)==='1'}catch(e){}w.__internalTraffic=f;w.dataLayer=w.dataLayer||[];if(f)ids.forEach(function(i){w['ga-disable-'+i]=!0})})(window,['G-DQP75SVP8B']);</script>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DQP75SVP8B"></script>
+<script>if(!window.__internalTraffic)(function(s){s.async=!0;s.src='https://www.googletagmanager.com/gtag/js?id=G-DQP75SVP8B';document.head.appendChild(s)})(document.createElement('script'))</script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
